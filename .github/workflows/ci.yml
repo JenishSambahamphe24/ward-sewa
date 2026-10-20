@@ -22,6 +22,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
+      - run: pnpm typecheck
       - run: pnpm --filter @ward-sewa/nepal-utils coverage
       - run: pnpm --filter @ward-sewa/api test
 

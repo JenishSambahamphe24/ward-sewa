@@ -1,16 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import pino from 'pino';
+import { pino } from 'pino';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
+import { describe, expect, it } from 'vitest';
+import { createApp } from '../../../src/app.ts';
+import type { HealthCheck } from '../../../src/modules/health/health.routes.ts';
 
-const logger = pino({ level: 'silent' });
-const up = () => Promise.resolve();
-const down = () => Promise.reject(new Error('connection refused'));
-const hangs = () => new Promise(() => {});
+const up: HealthCheck = () => Promise.resolve();
+const down: HealthCheck = () => Promise.reject(new Error('connection refused'));
+const hangs: HealthCheck = () => new Promise(() => {});
 
-function appWith(healthChecks) {
-  return createApp({ logger, healthChecks, healthTimeoutMs: 50 });
-}
+const appWith = (healthChecks: Record<string, HealthCheck>) =>
+  createApp({ logger: pino({ level: 'silent' }), healthChecks, healthTimeoutMs: 50 });
 
 describe('GET /health/live', () => {
   it('is ok even when every dependency is down', async () => {
@@ -46,27 +45,5 @@ describe('GET /health/ready', () => {
   it('does not leak the underlying error message', async () => {
     const res = await request(appWith({ postgres: down })).get('/health/ready');
     expect(JSON.stringify(res.body)).not.toContain('connection refused');
-  });
-});
-
-describe('error handling', () => {
-  it('returns a consistent 404 body for unknown routes', async () => {
-    const res = await request(appWith({})).get('/nope');
-    expect(res.status).toBe(404);
-    expect(res.body).toEqual({ error: { code: 'NOT_FOUND', message: 'No route for GET /nope' } });
-  });
-
-  it('returns 400 for malformed JSON', async () => {
-    const res = await request(appWith({}))
-      .post('/anything')
-      .set('Content-Type', 'application/json')
-      .send('{"broken":');
-    expect(res.status).toBe(400);
-    expect(res.body.error.code).toBe('MALFORMED_JSON');
-  });
-
-  it('does not advertise the framework', async () => {
-    const res = await request(appWith({})).get('/health/live');
-    expect(res.headers['x-powered-by']).toBeUndefined();
   });
 });

@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch --env-file-if-exists=../../.env src/server.js | pino-pretty",
+    "start": "node src/server.ts",
+    "dev": "node --watch --env-file-if-exists=../../.env src/server.ts | pino-pretty",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@ward-sewa/nepal-utils": "workspace:*",
@@ -20,8 +21,14 @@
     "zod": "catalog:generic"
   },
   "devDependencies": {
+    "@types/express": "catalog:be",
+    "@types/node": "catalog:generic",
+    "@types/pg": "catalog:be",
+    "@types/supertest": "catalog:be",
+    "@ward-sewa/config": "workspace:*",
     "pino-pretty": "catalog:be",
     "supertest": "catalog:be",
+    "typescript": "catalog:generic",
     "vitest": "catalog:generic"
   }
 }

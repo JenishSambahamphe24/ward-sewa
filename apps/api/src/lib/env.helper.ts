@@ -1,0 +1,23 @@
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PORT: z.coerce.number().int().positive().default(3000),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  DATABASE_URL: z.url(),
+  MONGO_URL: z.url(),
+  REDIS_URL: z.url(),
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+export class EnvHelper {
+  static load(source: NodeJS.ProcessEnv = process.env): Env {
+    const result = envSchema.safeParse(source);
+    if (!result.success) {
+      const problems = result.error.issues.map((i) => `  ${i.path.join('.')}: ${i.message}`);
+      throw new Error(`Invalid configuration:\n${problems.join('\n')}`);
+    }
+    return result.data;
+  }
+}
