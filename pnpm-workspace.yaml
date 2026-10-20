@@ -1,3 +1,31 @@
 packages:
   - apps/*
   - packages/*
+
+catalogs:
+  generic:
+    '@eslint/js': ^9.39.0
+    '@types/node': ^24.19.2
+    '@vitest/coverage-v8': ^3.2.4
+    eslint: ^9.39.0
+    globals: ^16.5.0
+    # Exact: bs-calendar.json was extracted from this version.
+    nepali-date-converter: 3.4.0
+    prettier: ^3.6.2
+    typescript: ~6.0.3
+    typescript-eslint: ^8.72.0
+    vitest: ^3.2.4
+    zod: ^4.6.7
+
+  be:
+    '@types/express': ^5.0.6
+    '@types/pg': ^8.23.1
+    '@types/supertest': ^7.2.1
+    express: ^5.3.0
+    ioredis: ^6.0.0
+    mongodb: ^7.7.0
+    pg: ^8.23.1
+    pino: ^10.4.0
+    pino-http: ^11.0.0
+    pino-pretty: ^13.2.0
+    supertest: ^7.3.1

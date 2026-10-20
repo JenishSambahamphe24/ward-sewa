@@ -7,6 +7,7 @@ RUN corepack enable
 # Manifests first, so the dependency layer is cached until a package.json or the lockfile changes.
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json apps/api/
+COPY packages/config/package.json packages/config/
 COPY packages/nepal-utils/package.json packages/nepal-utils/
 RUN pnpm install --frozen-lockfile --prod --filter @ward-sewa/api...
 

@@ -1,0 +1,19 @@
+{
+  "name": "@ward-sewa/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": "./eslint.js",
+    "./prettier": "./prettier.js",
+    "./tsconfig": "./tsconfig.base.json"
+  },
+  "peerDependencies": {
+    "@eslint/js": "catalog:generic",
+    "eslint": "catalog:generic",
+    "globals": "catalog:generic",
+    "prettier": "catalog:generic",
+    "typescript": "catalog:generic",
+    "typescript-eslint": "catalog:generic"
+  }
+}

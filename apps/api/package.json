@@ -11,17 +11,17 @@
   },
   "dependencies": {
     "@ward-sewa/nepal-utils": "workspace:*",
-    "express": "^5.3.0",
-    "ioredis": "^6.0.0",
-    "mongodb": "^7.7.0",
-    "pg": "^8.23.1",
-    "pino": "^10.4.0",
-    "pino-http": "^11.0.0",
-    "zod": "^4.6.7"
+    "express": "catalog:be",
+    "ioredis": "catalog:be",
+    "mongodb": "catalog:be",
+    "pg": "catalog:be",
+    "pino": "catalog:be",
+    "pino-http": "catalog:be",
+    "zod": "catalog:generic"
   },
   "devDependencies": {
-    "pino-pretty": "^13.2.0",
-    "supertest": "^7.3.1",
-    "vitest": "^3.2.4"
+    "pino-pretty": "catalog:be",
+    "supertest": "catalog:be",
+    "vitest": "catalog:generic"
   }
 }
