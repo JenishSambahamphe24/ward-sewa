@@ -1,0 +1,23 @@
+{
+  "name": "@ward-sewa/nepal-utils",
+  "version": "0.1.0",
+  "description": "Bikram Sambat date conversion, Nepali numerals and administrative divisions",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
+    "nepali-date-converter": "3.4.0",
+    "vitest": "^3.2.4"
+  }
+}

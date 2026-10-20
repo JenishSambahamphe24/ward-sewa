@@ -1,0 +1,130 @@
+{
+  "provinces": [
+    {
+      "id": 1,
+      "nameEn": "Koshi",
+      "nameNe": "कोशी",
+      "districts": [
+        "Bhojpur",
+        "Dhankuta",
+        "Ilam",
+        "Jhapa",
+        "Khotang",
+        "Morang",
+        "Okhaldhunga",
+        "Panchthar",
+        "Sankhuwasabha",
+        "Solukhumbu",
+        "Sunsari",
+        "Taplejung",
+        "Terhathum",
+        "Udayapur"
+      ]
+    },
+    {
+      "id": 2,
+      "nameEn": "Madhesh",
+      "nameNe": "मधेश",
+      "districts": [
+        "Bara",
+        "Dhanusha",
+        "Mahottari",
+        "Parsa",
+        "Rautahat",
+        "Saptari",
+        "Sarlahi",
+        "Siraha"
+      ]
+    },
+    {
+      "id": 3,
+      "nameEn": "Bagmati",
+      "nameNe": "बागमती",
+      "districts": [
+        "Bhaktapur",
+        "Chitwan",
+        "Dhading",
+        "Dolakha",
+        "Kathmandu",
+        "Kavrepalanchok",
+        "Lalitpur",
+        "Makwanpur",
+        "Nuwakot",
+        "Ramechhap",
+        "Rasuwa",
+        "Sindhuli",
+        "Sindhupalchok"
+      ]
+    },
+    {
+      "id": 4,
+      "nameEn": "Gandaki",
+      "nameNe": "गण्डकी",
+      "districts": [
+        "Baglung",
+        "Gorkha",
+        "Kaski",
+        "Lamjung",
+        "Manang",
+        "Mustang",
+        "Myagdi",
+        "Nawalpur",
+        "Parbat",
+        "Syangja",
+        "Tanahun"
+      ]
+    },
+    {
+      "id": 5,
+      "nameEn": "Lumbini",
+      "nameNe": "लुम्बिनी",
+      "districts": [
+        "Arghakhanchi",
+        "Banke",
+        "Bardiya",
+        "Dang",
+        "Eastern Rukum",
+        "Gulmi",
+        "Kapilvastu",
+        "Palpa",
+        "Parasi",
+        "Pyuthan",
+        "Rolpa",
+        "Rupandehi"
+      ]
+    },
+    {
+      "id": 6,
+      "nameEn": "Karnali",
+      "nameNe": "कर्णाली",
+      "districts": [
+        "Dailekh",
+        "Dolpa",
+        "Humla",
+        "Jajarkot",
+        "Jumla",
+        "Kalikot",
+        "Mugu",
+        "Salyan",
+        "Surkhet",
+        "Western Rukum"
+      ]
+    },
+    {
+      "id": 7,
+      "nameEn": "Sudurpashchim",
+      "nameNe": "सुदूरपश्चिम",
+      "districts": [
+        "Achham",
+        "Baitadi",
+        "Bajhang",
+        "Bajura",
+        "Dadeldhura",
+        "Darchula",
+        "Doti",
+        "Kailali",
+        "Kanchanpur"
+      ]
+    }
+  ]
+}
