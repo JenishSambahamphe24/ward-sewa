@@ -60,6 +60,11 @@ services:
       MONGO_URL: mongodb://mongo:27017/ward_sewa
       REDIS_URL: redis://redis:6379
     ports: ['127.0.0.1:3000:3000']
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health/live']
+      interval: 5s
+      timeout: 3s
+      retries: 10
     depends_on:
       migrate: { condition: service_completed_successfully }
       mongo: { condition: service_healthy }
