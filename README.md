@@ -8,8 +8,9 @@ or relationship certificates, and for ward staff to review, approve and issue th
 ## Architecture
 
 ```
-apps/api              Node.js + Express REST API
+apps/api              Node.js + Express 5 REST API (TypeScript)
 packages/nepal-utils  BS dates, Nepali numerals, provinces/districts (100% test coverage)
+packages/config       shared eslint / prettier / tsconfig presets
 
 PostgreSQL  source of truth: users, applications, workflow, issued letters
 Redis       OTP codes, rate limiting, caching, BullMQ job queues
@@ -51,18 +52,23 @@ causing an orchestrator to restart every API container.
 
 ```sh
 pnpm test            # all workspaces
+pnpm typecheck
 pnpm lint
 pnpm format
 ```
 
-CI runs lint, format check, tests with coverage thresholds, and a full `docker compose` boot with a
-readiness check on every push and pull request.
+TypeScript runs without a build step: Node 24 strips the types at runtime, and `tsc` only
+type-checks. Dependency versions are kept in one place, the catalogs in `pnpm-workspace.yaml`.
+
+CI runs lint, format check, typecheck, tests with coverage thresholds, and a full `docker compose`
+boot with a readiness check on every push and pull request.
 
 ## Roadmap
 
 - [x] `nepal-utils`: BS ↔ AD, Nepal-time "today", fiscal year, provinces/districts
 - [x] API skeleton: config validation, structured logging, consistent errors, health checks
 - [x] Docker Compose and CI
+- [x] TypeScript, shared tooling config, pnpm catalogs
 - [ ] PostgreSQL schema and migrations, OTP login, role-based access
 - [ ] Application workflow with enforced status transitions and optimistic locking
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
