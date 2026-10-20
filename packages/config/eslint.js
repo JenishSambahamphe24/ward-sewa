@@ -12,6 +12,7 @@ export default defineConfig(
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-extraneous-class': ['error', { allowStaticOnly: true }],
       'no-console': 'error',
     },
   },

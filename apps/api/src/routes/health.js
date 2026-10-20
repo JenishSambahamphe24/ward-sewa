@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { formatBs, todayBs } from '@ward-sewa/nepal-utils';
+import { BsDateHelper } from '@ward-sewa/nepal-utils';
 
 function withTimeout(promise, ms) {
   let timer;
@@ -41,7 +41,7 @@ export function healthRouter(checks, { timeoutMs = 2000 } = {}) {
 
     res.status(ready ? 200 : 503).json({
       status: ready ? 'ok' : 'degraded',
-      dateBs: formatBs(todayBs()),
+      dateBs: BsDateHelper.format(BsDateHelper.today()),
       dependencies,
     });
   });

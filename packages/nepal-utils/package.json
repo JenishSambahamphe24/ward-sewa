@@ -4,7 +4,7 @@
   "description": "Bikram Sambat date conversion, Nepali numerals and administrative divisions",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.ts"
   },
   "files": [
     "src"
@@ -13,11 +13,16 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc",
+    "build:calendar": "node scripts/build-calendar.ts"
   },
   "devDependencies": {
+    "@types/node": "catalog:generic",
     "@vitest/coverage-v8": "catalog:generic",
+    "@ward-sewa/config": "workspace:*",
     "nepali-date-converter": "catalog:generic",
+    "typescript": "catalog:generic",
     "vitest": "catalog:generic"
   }
 }

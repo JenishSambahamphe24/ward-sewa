@@ -1,0 +1,4 @@
+{
+  "extends": "@ward-sewa/config/tsconfig",
+  "include": ["src", "test", "scripts", "vitest.config.ts"]
+}
