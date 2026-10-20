@@ -1,0 +1,61 @@
+name: ward-sewa
+
+# Ports bind to 127.0.0.1 only, so the databases aren't reachable from other machines on your network.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ward_sewa
+      POSTGRES_PASSWORD: ward_sewa_dev
+      POSTGRES_DB: ward_sewa
+    ports: ['127.0.0.1:5432:5432']
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ward_sewa -d ward_sewa']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mongo:
+    image: mongo:8
+    ports: ['127.0.0.1:27017:27017']
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.adminCommand("ping").ok']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    # Append-only file so queued jobs survive a restart.
+    command: ['redis-server', '--appendonly', 'yes']
+    # Host port 6380 to avoid clashing with a locally installed Redis on 6379.
+    ports: ['127.0.0.1:6380:6379']
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://ward_sewa:ward_sewa_dev@postgres:5432/ward_sewa
+      MONGO_URL: mongodb://mongo:27017/ward_sewa
+      REDIS_URL: redis://redis:6379
+    ports: ['127.0.0.1:3000:3000']
+    depends_on:
+      postgres: { condition: service_healthy }
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+volumes:
+  postgres-data:
+  mongo-data:
+  redis-data:
