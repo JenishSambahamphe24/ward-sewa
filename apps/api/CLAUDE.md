@@ -54,6 +54,17 @@ service. Services can assume their input is well-formed.
 
 ## Database
 
+```sh
+pnpm db:generate   # after editing src/db/schema: writes a new SQL migration; review and commit it
+pnpm db:migrate    # applies migrations and seeds divisions (idempotent); Docker's migrate service runs it
+```
+
+- Drizzle with `casing: 'snake_case'`: camelCase in TypeScript, snake_case in SQL. Name
+  constraints explicitly.
+- Never edit a committed migration. A schema change is a new migration.
+- Location lookup tables (`provinces`, `districts`, `local_levels`, `wards`) are seeded from
+  `@ward-sewa/nepal-utils`. P-codes are their keys; `wards.id` is what other tables reference.
+
 - PostgreSQL is the source of truth. Anything needing a transaction or constraint lives there,
   including letter numbers (a sequence or row lock, never Redis).
 - Money columns are `numeric` and stay strings; see the root `CLAUDE.md`.
@@ -63,4 +74,6 @@ service. Services can assume their input is well-formed.
 
 - Unit tests mirror `src/` (`test/lib/promise.helper.test.ts` for `src/lib/promise.helper.ts`).
 - Route tests use `createApp` with supertest.
-- `test/integration/` runs against the Docker databases. No mocks for PostgreSQL, Redis or MongoDB.
+- `test/integration/` runs against real databases (`pnpm test:integration`). Its global setup drops and
+  recreates `ward_sewa_test` and applies migrations, so tests never depend on leftover data. No
+  mocks for PostgreSQL, Redis or MongoDB.

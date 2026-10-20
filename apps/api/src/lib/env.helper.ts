@@ -13,7 +13,15 @@ export type Env = z.infer<typeof envSchema>;
 
 export class EnvHelper {
   static load(source: NodeJS.ProcessEnv = process.env): Env {
-    const result = envSchema.safeParse(source);
+    return EnvHelper.parse(envSchema, source);
+  }
+
+  static loadDatabase(source: NodeJS.ProcessEnv = process.env): Pick<Env, 'DATABASE_URL'> {
+    return EnvHelper.parse(envSchema.pick({ DATABASE_URL: true }), source);
+  }
+
+  private static parse<T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T {
+    const result = schema.safeParse(source);
     if (!result.success) {
       const problems = result.error.issues.map((i) => `  ${i.path.join('.')}: ${i.message}`);
       throw new Error(`Invalid configuration:\n${problems.join('\n')}`);

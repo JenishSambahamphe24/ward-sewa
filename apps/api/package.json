@@ -6,12 +6,16 @@
   "scripts": {
     "start": "node src/server.ts",
     "dev": "node --watch --env-file-if-exists=../../.env src/server.ts | pino-pretty",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --env-file-if-exists=../../.env src/db/migrate.ts --seed",
+    "test": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:watch": "vitest --project unit",
     "typecheck": "tsc"
   },
   "dependencies": {
     "@ward-sewa/nepal-utils": "workspace:*",
+    "drizzle-orm": "catalog:be",
     "express": "catalog:be",
     "ioredis": "catalog:be",
     "mongodb": "catalog:be",
@@ -26,6 +30,7 @@
     "@types/pg": "catalog:be",
     "@types/supertest": "catalog:be",
     "@ward-sewa/config": "workspace:*",
+    "drizzle-kit": "catalog:be",
     "pino-pretty": "catalog:be",
     "supertest": "catalog:be",
     "typescript": "catalog:generic",

@@ -12,6 +12,17 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: ward_sewa
+          POSTGRES_PASSWORD: ward_sewa_dev
+          POSTGRES_DB: ward_sewa
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ward_sewa" --health-interval 5s --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -25,6 +36,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm --filter @ward-sewa/nepal-utils coverage
       - run: pnpm --filter @ward-sewa/api test
+      - run: pnpm --filter @ward-sewa/api test:integration
 
   docker:
     runs-on: ubuntu-latest

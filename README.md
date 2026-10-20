@@ -51,7 +51,8 @@ causing an orchestrator to restart every API container.
 ## Development
 
 ```sh
-pnpm test            # all workspaces
+pnpm test                  # unit tests, all workspaces
+pnpm test:integration      # API against a real PostgreSQL (start it with docker compose first)
 pnpm typecheck
 pnpm lint
 pnpm format
@@ -69,6 +70,7 @@ boot with a readiness check on every push and pull request.
 - [x] API skeleton: config validation, structured logging, consistent errors, health checks
 - [x] Docker Compose and CI
 - [x] TypeScript, shared tooling config, pnpm catalogs
+- [x] Location lookup tables: 753 local levels and 6,743 wards from official sources
 - [ ] PostgreSQL schema and migrations, OTP login, role-based access
 - [ ] Application workflow with enforced status transitions and optimistic locking
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS

@@ -39,6 +39,16 @@ services:
       timeout: 3s
       retries: 10
 
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ['node', 'apps/api/src/db/migrate.ts', '--seed']
+    environment:
+      DATABASE_URL: postgres://ward_sewa:ward_sewa_dev@postgres:5432/ward_sewa
+    depends_on:
+      postgres: { condition: service_healthy }
+
   api:
     build:
       context: .
@@ -51,7 +61,7 @@ services:
       REDIS_URL: redis://redis:6379
     ports: ['127.0.0.1:3000:3000']
     depends_on:
-      postgres: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
       mongo: { condition: service_healthy }
       redis: { condition: service_healthy }
 

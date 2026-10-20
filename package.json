@@ -12,7 +12,8 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:integration": "pnpm --filter @ward-sewa/api test:integration"
   },
   "prettier": "@ward-sewa/config/prettier",
   "devDependencies": {

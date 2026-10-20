@@ -1,4 +1,4 @@
 {
   "extends": "@ward-sewa/config/tsconfig",
-  "include": ["src", "test"]
+  "include": ["src", "test", "vitest.config.ts", "drizzle.config.ts"]
 }
