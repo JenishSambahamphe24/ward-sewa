@@ -94,16 +94,59 @@ interface WardSelectProps {
 export function WardSelect({ wards, value, onChange }: WardSelectProps) { ... }
 ```
 
+### Use the framework, not raw JS/DOM APIs
+
+Use what React, Express and our libraries provide. Hand-rolled equivalents are bugs waiting to
+happen.
+
+- **React:** `useRef` to reach an element, never `document.getElementById` / `querySelector`. State
+  and props drive the UI; never mutate `classList`, `style` or `innerHTML`. Use JSX event props
+  (`onClick`), not `addEventListener` on elements. A `window`/`document` listener goes in a `useEffect`
+  that removes it on cleanup.
+- **Backend:** zod for validation (no hand-written `typeof` checks), `req.log` / pino for logging
+  (never `console`), `express.Router` for routes, `AppError` for errors, the repository layer for
+  SQL.
+
+Lint blocks the DOM lookups in `apps/web`.
+
+### Class names: `cn()`, never template literals or if/else
+
+Compose `className` with `cn()` (clsx + tailwind-merge, `apps/web/src/lib/cn.ts`). Conditions go in
+`cn` as `cond && 'class'` or `{ class: cond }`, never in a template literal, ternary or `if/else`.
+`cn` is the one exception to the helper-class rule: it's on nearly every JSX line.
+
+```tsx
+<button className={cn('rounded px-3', isActive && 'bg-primary', { 'opacity-50': disabled })} />  // Correct
+<button className={`rounded px-3 ${isActive ? 'bg-primary' : ''}`} />                           // Wrong
+```
+
+Lint blocks template literals and ternaries in `className`.
+
+### Theme: one source of truth
+
+Colors, radii, fonts and shadows are defined once as CSS variables in
+`apps/web/src/styles/theme.css` (Tailwind v4 `@theme`), with light and dark values. Tokens are
+semantic: `primary`, `surface`, `muted`, `border`, `danger`, `success`, `warning`.
+
+- Components use only semantic classes: `bg-primary`, `text-muted-foreground`, `border-border`.
+- Never a hex/rgb value, a raw palette class (`bg-blue-600`), an arbitrary color (`bg-[#1d4ed8]`) or
+  an inline `style` color.
+- Rebranding or adding a theme means editing `theme.css` only.
+
+Lint blocks hex values and raw palette classes in `className`.
+
 ### Comments: only where the code can't speak for itself
 
 The default is no comment. A comment must explain something the reader cannot get from the code: an
 edge case, a non-obvious constraint, a cross-boundary contract, or why this and not the obvious
 thing.
 
+- **Short:** one line, about 80 characters at most. Long comments cost every reader's attention,
+  human or AI. A multi-line block needs a real reason.
 - Don't describe what a declaration is or does; the name and signature say that. Delete such doc
   blocks rather than rewording them.
 - If a comment is only needed because a name is bad, fix the name.
-- One terse line beats a block. Never leave a truncated comment behind.
+- Never leave a truncated comment behind.
 - No commented-out code, no `console.log` in a diff (lint enforces `no-console`; scripts are exempt).
 - Never add comments indicating AI authorship or generation.
 

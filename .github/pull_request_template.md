@@ -12,10 +12,11 @@
 - [ ] New behaviour has tests; database behaviour has integration tests against real databases
 - [ ] Errors go through `AppError`; no internal messages reach the client
 - [ ] New dependency versions are in a catalog in `pnpm-workspace.yaml`, not in `package.json`
+- [ ] UI uses `cn()` and semantic theme tokens; no DOM lookups, hex colors or palette classes
 - [ ] Workspace `CLAUDE.md` / README updated if a convention or command changed
 
 ## Comments
 
-- [ ] No comment restates what a declaration is or does; each one explains a why, an edge case or a
+- [ ] Comments are one short line; none restates what a declaration is or does; each one explains a why, an edge case or a
       constraint
 - [ ] No commented-out code, no `console.log`, no truncated comments
