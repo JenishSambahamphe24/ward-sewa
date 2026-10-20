@@ -9,7 +9,7 @@ or relationship certificates, and for ward staff to review, approve and issue th
 
 ```
 apps/api              Node.js + Express 5 REST API (TypeScript)
-packages/nepal-utils  BS dates, Nepali numerals, provinces/districts (100% test coverage)
+packages/nepal-utils  BS dates, Nepali numerals, all 753 local levels and wards (100% coverage)
 packages/config       shared eslint / prettier / tsconfig presets
 
 PostgreSQL  source of truth: users, applications, workflow, issued letters

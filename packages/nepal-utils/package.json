@@ -15,13 +15,15 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc",
-    "build:calendar": "node scripts/build-calendar.ts"
+    "build:calendar": "node scripts/build-calendar.ts",
+    "build:divisions": "node scripts/build-divisions.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:generic",
     "@vitest/coverage-v8": "catalog:generic",
     "@ward-sewa/config": "workspace:*",
     "nepali-date-converter": "catalog:generic",
+    "read-excel-file": "catalog:generic",
     "typescript": "catalog:generic",
     "vitest": "catalog:generic"
   }

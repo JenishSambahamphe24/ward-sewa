@@ -22,12 +22,23 @@ export interface FiscalYear {
 
 export interface Province {
   id: number;
-  nameEn: string;
-  nameNe: string;
-  districts: readonly string[];
+  code: string;
+  name: string;
 }
 
 export interface District {
+  code: string;
   name: string;
-  provinceId: number;
+  provinceCode: string;
+}
+
+export type LocalLevelType =
+  'metropolitan' | 'sub_metropolitan' | 'municipality' | 'rural_municipality';
+
+export interface LocalLevel {
+  code: string;
+  name: string;
+  type: LocalLevelType;
+  districtCode: string;
+  wards: number;
 }

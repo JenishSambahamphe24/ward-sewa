@@ -12,6 +12,7 @@ catalogs:
     # Exact: bs-calendar.json was extracted from this version.
     nepali-date-converter: 3.4.0
     prettier: ^3.6.2
+    read-excel-file: 9.3.10
     typescript: ~6.0.3
     typescript-eslint: ^8.72.0
     vitest: ^3.2.4
