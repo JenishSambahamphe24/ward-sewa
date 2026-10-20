@@ -44,6 +44,8 @@ clients pointed at the Docker databases.
 - Anything that isn't an `AppError` (or a recognised zod / body-parser error) is logged in full and
   returned as a generic `500 INTERNAL_ERROR`. Never put internal messages, SQL or stack traces in an
   `AppError`.
+- PostgreSQL errors are mapped centrally: unique violation (23505) → 409 `CONFLICT`, foreign-key
+  violation (23503) → 400 `VALIDATION_FAILED`, never exposing the constraint name.
 - Status codes: 400 validation, 401 unauthenticated, 403 wrong role or ward, 404 not found or not
   yours, 409 invalid transition or version conflict, 413 body too large, 429 rate limited.
 
@@ -57,6 +59,7 @@ service. Services can assume their input is well-formed.
 ```sh
 pnpm db:generate   # after editing src/db/schema: writes a new SQL migration; review and commit it
 pnpm db:migrate    # applies migrations and seeds divisions (idempotent); Docker's migrate service runs it
+pnpm admin:create --phone 98XXXXXXXX --local-level NP0327101 --name "..."   # first municipality admin
 ```
 
 - Drizzle with `casing: 'snake_case'`: camelCase in TypeScript, snake_case in SQL. Name

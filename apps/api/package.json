@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node src/server.ts",
-    "dev": "node --watch --env-file-if-exists=../../.env src/server.ts | pino-pretty",
+    "admin:create": "node --env-file-if-exists=../../.env src/cli/create-admin.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file-if-exists=../../.env src/db/migrate.ts --seed",
+    "dev": "node --watch --env-file-if-exists=../../.env src/server.ts | pino-pretty",
+    "start": "node src/server.ts",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "test:watch": "vitest --project unit",

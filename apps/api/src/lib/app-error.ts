@@ -1,5 +1,10 @@
 export type ErrorCode =
-  'NOT_FOUND' | 'VALIDATION_FAILED' | 'MALFORMED_JSON' | 'PAYLOAD_TOO_LARGE' | 'INTERNAL_ERROR';
+  | 'NOT_FOUND'
+  | 'VALIDATION_FAILED'
+  | 'MALFORMED_JSON'
+  | 'CONFLICT'
+  | 'PAYLOAD_TOO_LARGE'
+  | 'INTERNAL_ERROR';
 
 /** `message` and `details` are sent to the client, so they must never contain internals. */
 export class AppError extends Error {

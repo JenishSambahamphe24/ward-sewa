@@ -47,6 +47,22 @@ describe('errorHandler', () => {
     });
   });
 
+  it.each([
+    ['23505', 409, 'CONFLICT'],
+    ['23503', 400, 'VALIDATION_FAILED'],
+  ])(
+    'maps PostgreSQL %s to %i %s without leaking the constraint',
+    async (code, status, errorCode) => {
+      const dbError = new Error('Failed query', {
+        cause: { code, constraint: 'users_phone_unique' },
+      });
+      const res = await request(appThrowing(dbError)).get('/boom');
+      expect(res.status).toBe(status);
+      expect(res.body.error.code).toBe(errorCode);
+      expect(JSON.stringify(res.body)).not.toContain('users_phone_unique');
+    },
+  );
+
   it('returns 400 MALFORMED_JSON for an unparseable body', async () => {
     const res = await request(appThrowing(null))
       .post('/json')

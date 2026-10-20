@@ -1,0 +1,448 @@
+{
+  "id": "a6782d15-c4e6-48b0-aa4b-7cc981f3d7d2",
+  "prevId": "1b243659-acd9-426b-8830-0e940e0bbc65",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.districts": {
+      "name": "districts",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "province_code": {
+          "name": "province_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "districts_province_code_index": {
+          "name": "districts_province_code_index",
+          "columns": [
+            {
+              "expression": "province_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "districts_province_code_provinces_code_fk": {
+          "name": "districts_province_code_provinces_code_fk",
+          "tableFrom": "districts",
+          "tableTo": "provinces",
+          "columnsFrom": [
+            "province_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "districts_code_format": {
+          "name": "districts_code_format",
+          "value": "\"districts\".\"code\" ~ '^NP[0-9]{4}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.local_levels": {
+      "name": "local_levels",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "local_level_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "district_code": {
+          "name": "district_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ward_count": {
+          "name": "ward_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "local_levels_district_code_index": {
+          "name": "local_levels_district_code_index",
+          "columns": [
+            {
+              "expression": "district_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "local_levels_district_code_districts_code_fk": {
+          "name": "local_levels_district_code_districts_code_fk",
+          "tableFrom": "local_levels",
+          "tableTo": "districts",
+          "columnsFrom": [
+            "district_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "local_levels_code_format": {
+          "name": "local_levels_code_format",
+          "value": "\"local_levels\".\"code\" ~ '^NP[0-9]{7}$'"
+        },
+        "local_levels_ward_count_positive": {
+          "name": "local_levels_ward_count_positive",
+          "value": "\"local_levels\".\"ward_count\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.provinces": {
+      "name": "provinces",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "provinces_code_format": {
+          "name": "provinces_code_format",
+          "value": "\"provinces\".\"code\" ~ '^NP[0-9]{2}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.wards": {
+      "name": "wards",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "wards_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "local_level_code": {
+          "name": "local_level_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ward_no": {
+          "name": "ward_no",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "wards_local_level_code_local_levels_code_fk": {
+          "name": "wards_local_level_code_local_levels_code_fk",
+          "tableFrom": "wards",
+          "tableTo": "local_levels",
+          "columnsFrom": [
+            "local_level_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "wards_local_level_code_ward_no_unique": {
+          "name": "wards_local_level_code_ward_no_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "local_level_code",
+            "ward_no"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "wards_ward_no_positive": {
+          "name": "wards_ward_no_positive",
+          "value": "\"wards\".\"ward_no\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "users_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "user_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'citizen'"
+        },
+        "ward_id": {
+          "name": "ward_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "local_level_code": {
+          "name": "local_level_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "users_one_active_chair_per_ward": {
+          "name": "users_one_active_chair_per_ward",
+          "columns": [
+            {
+              "expression": "ward_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"users\".\"role\" = 'ward_chair' AND \"users\".\"is_active\"",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "users_ward_id_index": {
+          "name": "users_ward_id_index",
+          "columns": [
+            {
+              "expression": "ward_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "users_ward_id_wards_id_fk": {
+          "name": "users_ward_id_wards_id_fk",
+          "tableFrom": "users",
+          "tableTo": "wards",
+          "columnsFrom": [
+            "ward_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "users_local_level_code_local_levels_code_fk": {
+          "name": "users_local_level_code_local_levels_code_fk",
+          "tableFrom": "users",
+          "tableTo": "local_levels",
+          "columnsFrom": [
+            "local_level_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_phone_unique": {
+          "name": "users_phone_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "phone"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "users_phone_format": {
+          "name": "users_phone_format",
+          "value": "\"users\".\"phone\" ~ '^9[678][0-9]{8}$'"
+        },
+        "users_role_scope": {
+          "name": "users_role_scope",
+          "value": "(\"users\".\"role\" = 'citizen' AND \"users\".\"ward_id\" IS NULL AND \"users\".\"local_level_code\" IS NULL)\n        OR (\"users\".\"role\" IN ('ward_secretary', 'ward_chair') AND \"users\".\"ward_id\" IS NOT NULL AND \"users\".\"local_level_code\" IS NULL)\n        OR (\"users\".\"role\" = 'municipality_admin' AND \"users\".\"local_level_code\" IS NOT NULL AND \"users\".\"ward_id\" IS NULL)"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.local_level_type": {
+      "name": "local_level_type",
+      "schema": "public",
+      "values": [
+        "metropolitan",
+        "sub_metropolitan",
+        "municipality",
+        "rural_municipality"
+      ]
+    },
+    "public.user_role": {
+      "name": "user_role",
+      "schema": "public",
+      "values": [
+        "citizen",
+        "ward_secretary",
+        "ward_chair",
+        "municipality_admin"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
