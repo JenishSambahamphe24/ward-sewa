@@ -17,6 +17,22 @@ export class UsersRepository {
     return user ?? null;
   }
 
+  async findById(id: number): Promise<User | null> {
+    const [user] = await this.#db.select().from(users).where(eq(users.id, id));
+    return user ?? null;
+  }
+
+  async findOrCreateCitizen(phone: string): Promise<User> {
+    const [created] = await this.#db
+      .insert(users)
+      .values({ phone })
+      .onConflictDoNothing()
+      .returning();
+    const user = created ?? (await this.findByPhone(phone));
+    if (!user) throw new Error('User vanished between insert and select');
+    return user;
+  }
+
   async create(values: NewUser): Promise<User> {
     const [user] = await this.#db.insert(users).values(values).returning();
     if (!user) throw new Error('INSERT ... RETURNING returned no row');

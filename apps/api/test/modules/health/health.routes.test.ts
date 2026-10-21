@@ -1,15 +1,15 @@
-import { pino } from 'pino';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { createApp } from '../../../src/app.ts';
 import type { HealthCheck } from '../../../src/modules/health/health.routes.ts';
+import { UnitDeps } from '../../support/unit-deps.ts';
 
 const up: HealthCheck = () => Promise.resolve();
 const down: HealthCheck = () => Promise.reject(new Error('connection refused'));
 const hangs: HealthCheck = () => new Promise(() => {});
 
 const appWith = (healthChecks: Record<string, HealthCheck>) =>
-  createApp({ logger: pino({ level: 'silent' }), healthChecks, healthTimeoutMs: 50 });
+  createApp(UnitDeps.create({ healthChecks, healthTimeoutMs: 50 }));
 
 describe('GET /health/live', () => {
   it('is ok even when every dependency is down', async () => {

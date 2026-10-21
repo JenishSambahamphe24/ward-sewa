@@ -3,7 +3,9 @@ import { MongoClient } from 'mongodb';
 import pg from 'pg';
 import { pino } from 'pino';
 import { createApp } from './app.ts';
+import { createDb } from './db/client.ts';
 import { EnvHelper } from './lib/env.helper.ts';
+import { LogSmsGateway } from './lib/sms.ts';
 
 const env = EnvHelper.load();
 const logger = pino({ level: env.LOG_LEVEL });
@@ -24,6 +26,10 @@ try {
 
 const app = createApp({
   logger,
+  db: createDb(pool),
+  redis,
+  sms: new LogSmsGateway(logger),
+  authSecret: env.AUTH_SECRET,
   healthChecks: {
     postgres: () => pool.query('SELECT 1'),
     mongo: () => mongo.db().command({ ping: 1 }),

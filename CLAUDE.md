@@ -24,7 +24,7 @@ docker-compose.yml       # postgres, mongo, redis, api
 
 ```sh
 pnpm test && pnpm typecheck && pnpm lint && pnpm format:check   # what CI runs
-pnpm test:integration                     # needs `docker compose up -d --wait postgres`
+pnpm test:integration                     # needs `docker compose up -d --wait postgres redis`
 pnpm --filter @ward-sewa/nepal-utils coverage
 docker compose up -d --build --wait   # postgres:5432, mongo:27017, redis:6380 (not 6379), api:3000
 curl localhost:3000/health/ready

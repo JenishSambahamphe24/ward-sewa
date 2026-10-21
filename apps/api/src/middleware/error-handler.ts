@@ -21,7 +21,9 @@ function postgresCode(err: unknown): string | undefined {
 function toAppError(err: unknown): AppError | null {
   if (err instanceof AppError) return err;
   if (err instanceof ZodError) {
-    return new AppError(400, 'VALIDATION_FAILED', 'Request validation failed', err.issues);
+    return new AppError(400, 'VALIDATION_FAILED', 'Request validation failed', {
+      details: err.issues,
+    });
   }
   switch (postgresCode(err)) {
     case '23505':
@@ -53,6 +55,7 @@ export function errorHandler(
     appError = new AppError(500, 'INTERNAL_ERROR', 'Something went wrong');
   }
 
-  const { status, code, message, details } = appError;
+  const { status, code, message, details, headers } = appError;
+  res.set(headers);
   res.status(status).json({ error: { code, message, ...(details ? { details } : {}) } });
 }

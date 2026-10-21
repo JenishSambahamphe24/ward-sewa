@@ -49,6 +49,17 @@ clients pointed at the Docker databases.
 - Status codes: 400 validation, 401 unauthenticated, 403 wrong role or ward, 404 not found or not
   yours, 409 invalid transition or version conflict, 413 body too large, 429 rate limited.
 
+## Auth
+
+- OTP login: `POST /auth/otp/request` → `POST /auth/otp/verify` returns an opaque session token;
+  send it as `Authorization: Bearer <token>`. `GET /auth/me`, `POST /auth/logout`.
+- Redis keys: `otp:code:<phone>` (HMAC of the code + attempts, 5 min TTL), `otp:requests:<phone>`
+  (3 per 15 min), `session:<sha256(token)>` (user id, 7 days). Never store a raw code or token.
+- `requireAuth(auth)` loads the user from PostgreSQL on every request, so deactivation and role
+  changes apply immediately. `requireRole(...roles)` after it for role checks; scope checks (own
+  ward, own municipality) belong in the service.
+- `SMS_GATEWAY=log` writes codes to the log. Development only; the BullMQ gateway replaces it.
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the

@@ -7,6 +7,8 @@ const envSchema = z.object({
   DATABASE_URL: z.url(),
   MONGO_URL: z.url(),
   REDIS_URL: z.url(),
+  AUTH_SECRET: z.string().min(32, 'Use at least 32 random characters'),
+  SMS_GATEWAY: z.enum(['log']).default('log'),
 });
 
 export type Env = z.infer<typeof envSchema>;

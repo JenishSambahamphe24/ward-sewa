@@ -5,6 +5,7 @@ const valid = {
   DATABASE_URL: 'postgres://u:p@localhost:5432/db',
   MONGO_URL: 'mongodb://localhost:27017/db',
   REDIS_URL: 'redis://localhost:6379',
+  AUTH_SECRET: 'x'.repeat(32),
 };
 
 describe('EnvHelper.load', () => {

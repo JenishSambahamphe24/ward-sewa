@@ -1,9 +1,9 @@
-import { pino } from 'pino';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.ts';
+import { UnitDeps } from './support/unit-deps.ts';
 
-const app = createApp({ logger: pino({ level: 'silent' }), healthChecks: {} });
+const app = createApp(UnitDeps.create());
 
 describe('createApp', () => {
   it('does not advertise the framework', async () => {

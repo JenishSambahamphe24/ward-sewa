@@ -17,7 +17,8 @@ services:
       retries: 10
 
   mongo:
-    image: mongo:8
+    # 8.x refuses to start on Linux kernel 6.19+ (SERVER-121912); revisit when fixed.
+    image: mongo:7.0
     ports: ['127.0.0.1:27017:27017']
     volumes: [mongo-data:/data/db]
     healthcheck:
@@ -59,6 +60,7 @@ services:
       DATABASE_URL: postgres://ward_sewa:ward_sewa_dev@postgres:5432/ward_sewa
       MONGO_URL: mongodb://mongo:27017/ward_sewa
       REDIS_URL: redis://redis:6379
+      AUTH_SECRET: dev-only-change-me-dev-only-change-me-0000
     ports: ['127.0.0.1:3000:3000']
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health/live']
