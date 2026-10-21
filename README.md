@@ -73,7 +73,7 @@ boot with a readiness check on every push and pull request.
 - [x] Location lookup tables: 753 local levels and 6,743 wards from official sources
 - [x] Users with scoped roles (citizen, ward secretary, ward chair, municipality admin)
 - [x] OTP login with Redis: expiring hashed codes, rate limiting, revocable sessions
-- [ ] Staff management by the municipality admin
+- [x] Staff management by the municipality admin, scoped to their own municipality
 - [ ] Application workflow with enforced status transitions and optimistic locking
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
 - [ ] MongoDB: audit trail and notification log

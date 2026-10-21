@@ -38,8 +38,8 @@ clients pointed at the Docker databases.
 
 ## Errors
 
-- Throw `AppError(status, code, message, details?)` for anything the client should see. Add new codes
-  to the `ErrorCode` union in `lib/app-error.ts`.
+- Throw `AppError(status, code, message, { details?, headers? })` for anything the client should
+  see. Add new codes to the `ErrorCode` union in `lib/app-error.ts`.
 - Every error leaves as `{ error: { code, message, details? } }` through `middleware/error-handler.ts`.
 - Anything that isn't an `AppError` (or a recognised zod / body-parser error) is logged in full and
   returned as a generic `500 INTERNAL_ERROR`. Never put internal messages, SQL or stack traces in an
@@ -59,6 +59,14 @@ clients pointed at the Docker databases.
   changes apply immediately. `requireRole(...roles)` after it for role checks; scope checks (own
   ward, own municipality) belong in the service.
 - `SMS_GATEWAY=log` writes codes to the log. Development only; the BullMQ gateway replaces it.
+- In controllers, get the user with `RequestHelper.user(req)`.
+
+## Staff management
+
+`GET/POST /admin/staff`, `PATCH /admin/staff/:id`, municipality admins only. Every query joins
+through `wards` filtered by the admin's `local_level_code`; another municipality's staff, and
+admins themselves, return 404. One active chair per ward is checked in the service (friendly 409)
+and enforced by a partial unique index.
 
 ## Validation
 

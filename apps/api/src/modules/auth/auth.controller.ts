@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { AppError } from '../../lib/app-error.ts';
+import { RequestHelper } from '../../lib/request.helper.ts';
 import type { User } from '../users/users.repository.ts';
 import type { AuthService } from './auth.service.ts';
 
@@ -29,8 +29,7 @@ export class AuthController {
   };
 
   me = (req: Request, res: Response) => {
-    if (!req.user) throw new AppError(401, 'UNAUTHENTICATED', 'Log in to continue');
-    res.json({ user: toView(req.user) });
+    res.json({ user: toView(RequestHelper.user(req)) });
   };
 
   logout = async (req: Request, res: Response) => {

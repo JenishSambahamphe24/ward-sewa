@@ -14,6 +14,10 @@ import { OtpStore } from './modules/auth/otp.store.ts';
 import { SessionStore } from './modules/auth/session.store.ts';
 import { healthRouter } from './modules/health/health.routes.ts';
 import type { HealthCheck } from './modules/health/health.routes.ts';
+import { StaffController } from './modules/staff/staff.controller.ts';
+import { StaffRepository } from './modules/staff/staff.repository.ts';
+import { staffRouter } from './modules/staff/staff.routes.ts';
+import { StaffService } from './modules/staff/staff.service.ts';
 import { UsersRepository } from './modules/users/users.repository.ts';
 
 export interface AppDeps {
@@ -28,12 +32,15 @@ export interface AppDeps {
 
 // Opens no connections: tests pass fakes or test databases, server.ts passes real clients.
 export function createApp(deps: AppDeps): Express {
+  const users = new UsersRepository(deps.db);
   const auth = new AuthService({
     otp: new OtpStore(deps.redis, deps.authSecret),
     sessions: new SessionStore(deps.redis),
-    users: new UsersRepository(deps.db),
+    users,
     sms: deps.sms,
   });
+  const staff = new StaffService({ staff: new StaffRepository(deps.db), users });
+  const authenticated = requireAuth(auth);
 
   const app = express();
 
@@ -42,7 +49,8 @@ export function createApp(deps: AppDeps): Express {
   app.use(express.json({ limit: '100kb' }));
 
   app.use(healthRouter(deps.healthChecks, { timeoutMs: deps.healthTimeoutMs }));
-  app.use(authRouter(new AuthController(auth), requireAuth(auth)));
+  app.use(authRouter(new AuthController(auth), authenticated));
+  app.use(staffRouter(new StaffController(staff), authenticated));
 
   app.use(notFound);
   app.use(errorHandler);
