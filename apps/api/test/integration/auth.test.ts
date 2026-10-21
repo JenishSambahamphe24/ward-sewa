@@ -33,7 +33,7 @@ async function login(): Promise<string> {
 beforeAll(() => DivisionsSeed.run(db));
 beforeEach(async () => {
   await redis.flushdb();
-  await db.delete(users);
+  await TestDb.reset(db);
   sent.length = 0;
 });
 afterAll(async () => {

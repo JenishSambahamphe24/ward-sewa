@@ -20,7 +20,7 @@ beforeAll(async () => {
     .where(and(eq(wards.localLevelCode, KATHMANDU), eq(wards.wardNo, 5)));
   ward5 = row?.id ?? 0;
 });
-beforeEach(() => db.delete(users));
+beforeEach(() => TestDb.reset(db));
 afterAll(() => pool.end());
 
 describe('UsersService.createMunicipalityAdmin', () => {

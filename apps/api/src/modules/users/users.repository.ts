@@ -38,4 +38,10 @@ export class UsersRepository {
     if (!user) throw new Error('INSERT ... RETURNING returned no row');
     return user;
   }
+
+  async update(id: number, values: Partial<NewUser>): Promise<User> {
+    const [user] = await this.#db.update(users).set(values).where(eq(users.id, id)).returning();
+    if (!user) throw new Error('UPDATE ... RETURNING returned no row');
+    return user;
+  }
 }

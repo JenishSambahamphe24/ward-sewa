@@ -68,6 +68,19 @@ through `wards` filtered by the admin's `local_level_code`; another municipality
 admins themselves, return 404. One active chair per ward is checked in the service (friendly 409)
 and enforced by a partial unique index.
 
+## Service types and applications
+
+- `service_types` are per municipality (`local_level_code`); fee is `numeric` and leaves the API as a
+  string. `GET /service-types?localLevel=` is public. Demo data comes from
+  `db/seeds/service-types.seed.ts` (sample, Kathmandu and Lalitpur only).
+- Each service type defines its `formFields`; `FormDataHelper.schema(fields, { complete })`
+  validates `form_data`. Drafts may be partial; submit uses `complete: true`. Unknown keys are
+  rejected, BS dates are normalised to `YYYY-MM-DD`.
+- Citizens own applications: every query filters by `citizen_id`; someone else's is 404.
+- Edits send `version`; `updateEditable` matches `id + citizen_id + version + editable status` and
+  bumps the version. Zero rows → 409. Only `draft` and `needs_info` are editable.
+- Integration tests reset with `TestDb.reset(db)` (TRUNCATE … CASCADE), never `DELETE FROM users`.
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the

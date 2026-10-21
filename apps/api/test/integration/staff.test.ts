@@ -40,7 +40,7 @@ const secretary = { phone: '9841000101', name: 'Ram Thapa', role: 'ward_secretar
 beforeAll(() => DivisionsSeed.run(db));
 beforeEach(async () => {
   await redis.flushdb();
-  await db.delete(users);
+  await TestDb.reset(db);
   ktmAdmin = await tokenFor({
     phone: '9841000001',
     role: 'municipality_admin',

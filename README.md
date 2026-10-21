@@ -74,7 +74,8 @@ boot with a readiness check on every push and pull request.
 - [x] Users with scoped roles (citizen, ward secretary, ward chair, municipality admin)
 - [x] OTP login with Redis: expiring hashed codes, rate limiting, revocable sessions
 - [x] Staff management by the municipality admin, scoped to their own municipality
-- [ ] Application workflow with enforced status transitions and optimistic locking
+- [x] Service types per municipality; citizens create and edit draft applications with optimistic locking
+- [ ] Documents, submission and the review workflow with enforced status transitions
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
 - [ ] MongoDB: audit trail and notification log
 - [ ] Letter PDF in Nepali with QR code verification
