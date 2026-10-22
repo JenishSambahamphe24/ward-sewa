@@ -1,9 +1,23 @@
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { BsDateHelper } from '@ward-sewa/nepal-utils';
+import { Queue, Worker } from 'bullmq';
+import { Redis } from 'ioredis';
 import { and, eq, sql } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { serviceTypes, users, wards } from '../../src/db/schema/index.ts';
 import { DivisionsSeed } from '../../src/db/seeds/divisions.seed.ts';
+import { LocalFileStorage } from '../../src/lib/file-storage.ts';
+import { LetterPdfProcessor } from '../../src/modules/letters/letter-pdf.processor.ts';
+import {
+  BullLetterPdfQueue,
+  LETTER_PDF_QUEUE,
+} from '../../src/modules/letters/letter-pdf.queue.ts';
+import type { LetterPdfJob } from '../../src/modules/letters/letter-pdf.queue.ts';
+import { ApplicationsRepository } from '../../src/modules/applications/applications.repository.ts';
+import { LettersRepository } from '../../src/modules/letters/letters.repository.ts';
 import { ServiceTypesSeed } from '../../src/db/seeds/service-types.seed.ts';
 import { TestApp } from './support/test-app.ts';
 import { TestDb } from './support/test-db.ts';
@@ -15,9 +29,18 @@ const PDF = Buffer.from('%PDF-1.4\n%%EOF\n');
 const FISCAL_YEAR = BsDateHelper.fiscalYear(BsDateHelper.today()).label;
 const { pool, db } = TestDb.connect();
 const redis = TestRedis.connect();
-const app = TestApp.create(db, redis);
+const storage = new LocalFileStorage(mkdtempSync(join(tmpdir(), 'ward-sewa-letters-')));
+const queue = new BullLetterPdfQueue(redis);
+const app = TestApp.create(db, redis, { storage, letterPdfQueue: queue });
+const processor = new LetterPdfProcessor({
+  letters: new LettersRepository(db, new ApplicationsRepository(db)),
+  storage,
+  publicBaseUrl: 'https://wardsewa.example',
+});
+const inspect = new Queue<LetterPdfJob>(LETTER_PDF_QUEUE, { connection: redis });
 
 let unmarriedId: number;
+let residenceId: number;
 let wardIds: Record<number, number>;
 let citizen: Auth;
 interface Staff {
@@ -38,17 +61,25 @@ const wardId = async (wardNo: number) => {
 
 // Drives one application through the real API to `approved`: create v1, submit v2, review v3,
 // approve v4 (uploads don't bump the version).
-async function approved(wardNo = 5): Promise<number> {
+async function approved(wardNo = 5, residence = false): Promise<number> {
   const { body } = await request(app)
     .post('/applications')
     .set(citizen)
-    .send({ serviceTypeId: unmarriedId, localLevelCode: KATHMANDU, wardNo, tole: 'Baneshwor' });
+    .send({
+      serviceTypeId: residence ? residenceId : unmarriedId,
+      localLevelCode: KATHMANDU,
+      wardNo,
+      tole: 'Baneshwor',
+      formData: residence ? { residingSince: '2075-03-15' } : {},
+    });
   const id = body.application.id;
-  await request(app)
-    .post(`/applications/${id}/documents`)
-    .set(citizen)
-    .field('documentCode', 'citizenship')
-    .attach('file', PDF, 'citizenship.pdf');
+  for (const documentCode of residence ? ['citizenship', 'land_or_rent'] : ['citizenship']) {
+    await request(app)
+      .post(`/applications/${id}/documents`)
+      .set(citizen)
+      .field('documentCode', documentCode)
+      .attach('file', PDF, `${documentCode}.pdf`);
+  }
   await request(app).post(`/applications/${id}/submit`).set(citizen).send({ version: 1 });
   const move = (auth: Auth, version: number, to: string) =>
     request(app).post(`/staff/applications/${id}/transition`).set(auth).send({ to, version });
@@ -64,8 +95,10 @@ beforeAll(async () => {
   await DivisionsSeed.run(db);
   await ServiceTypesSeed.run(db);
   const types = await db.select().from(serviceTypes);
-  unmarriedId =
-    types.find((t) => t.localLevelCode === KATHMANDU && t.code === 'unmarried')?.id ?? 0;
+  const typeId = (code: string) =>
+    types.find((t) => t.localLevelCode === KATHMANDU && t.code === code)?.id ?? 0;
+  unmarriedId = typeId('unmarried');
+  residenceId = typeId('residence');
   wardIds = { 5: await wardId(5), 7: await wardId(7) };
 });
 beforeEach(async () => {
@@ -82,6 +115,8 @@ beforeEach(async () => {
   };
 });
 afterAll(async () => {
+  await queue.close();
+  await inspect.close();
   await pool.end();
   redis.disconnect();
 });
@@ -216,5 +251,92 @@ describe('GET /verify/:code (public)', () => {
   it('returns 404 for an unknown code and 400 for a malformed one', async () => {
     expect((await request(app).get('/verify/0000000000')).status).toBe(404);
     expect((await request(app).get('/verify/not-a-code')).status).toBe(400);
+  });
+});
+
+describe('letter PDF (BullMQ)', () => {
+  const issued = async () => {
+    const id = await approved();
+    const { body } = await issue(staff.secretary5, id);
+    return { applicationId: id, verificationCode: body.letter.verificationCode as string };
+  };
+  const letterId = async (applicationId: number) =>
+    (
+      await new LettersRepository(db, new ApplicationsRepository(db)).findByApplication(
+        applicationId,
+      )
+    )?.id ?? 0;
+
+  it('queues exactly one render job per letter', async () => {
+    const { applicationId } = await issued();
+    const id = await letterId(applicationId);
+    await queue.enqueue(id);
+    const job = await inspect.getJob(`letter-${id}`);
+    expect(job?.data).toEqual({ letterId: id });
+    expect(await inspect.getJobCounts('waiting')).toEqual({ waiting: 1 });
+  });
+
+  it('answers 409 with Retry-After until the PDF exists, then serves it', async () => {
+    const { applicationId } = await issued();
+    const url = `/applications/${applicationId}/letter/pdf`;
+    const early = await request(app).get(url).set(citizen);
+    expect(early.status).toBe(409);
+    expect(early.headers['retry-after']).toBe('5');
+
+    expect(await processor.process(await letterId(applicationId))).toBe('rendered');
+    const pdf = await request(app).get(url).set(citizen).buffer(true);
+    expect(pdf.status).toBe(200);
+    expect(pdf.headers['content-type']).toBe('application/pdf');
+    expect(Buffer.from(pdf.body).subarray(0, 5).toString()).toBe('%PDF-');
+    const letter = await request(app).get(`/applications/${applicationId}/letter`).set(citizen);
+    expect(letter.body.letter.pdfReady).toBe(true);
+  });
+
+  it('is idempotent: re-running or racing a job attaches exactly one PDF', async () => {
+    const id = await letterId((await issued()).applicationId);
+    const results = await Promise.all([processor.process(id), processor.process(id)]);
+    expect(results).toContain('rendered');
+    expect(results.filter((r) => r === 'rendered')).toHaveLength(1);
+    expect(await processor.process(id)).toBe('already-rendered');
+  });
+
+  it('freezes the form labels into the snapshot at issue time', async () => {
+    const id = await approved(5, true);
+    await issue(staff.secretary5, id);
+    const repo = new LettersRepository(db, new ApplicationsRepository(db));
+    const letter = await repo.findByApplication(id);
+    expect(letter?.snapshot.fields).toEqual([
+      {
+        key: 'residingSince',
+        labelNe: 'बसोबास सुरु मिति',
+        labelEn: 'Living here since (BS)',
+        value: '2075-03-15',
+      },
+    ]);
+  });
+
+  it('is processed end to end by a real worker', async () => {
+    const { applicationId } = await issued();
+    const connection = new Redis(TestRedis.url, { maxRetriesPerRequest: null });
+    const worker = new Worker<LetterPdfJob>(
+      LETTER_PDF_QUEUE,
+      (job) => processor.process(job.data.letterId),
+      {
+        connection,
+      },
+    );
+    try {
+      const deadline = Date.now() + 15_000;
+      let ready = false;
+      while (!ready && Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        const res = await request(app).get(`/applications/${applicationId}/letter`).set(citizen);
+        ready = res.body.letter.pdfReady;
+      }
+      expect(ready).toBe(true);
+    } finally {
+      await worker.close();
+      connection.disconnect();
+    }
   });
 });

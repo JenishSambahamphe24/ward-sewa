@@ -1,17 +1,25 @@
 import { BsDateHelper, DivisionHelper } from '@ward-sewa/nepal-utils';
-import type { LetterSnapshot } from '../../db/schema/index.ts';
+import type { Logger } from 'pino';
+import type { FormField, LetterSnapshot } from '../../db/schema/index.ts';
 import { AppError } from '../../lib/app-error.ts';
 import { CodeHelper } from '../../lib/code.helper.ts';
+import type { FileStorage } from '../../lib/file-storage.ts';
 import type { ApplicationAccess } from '../applications/application-access.ts';
 import type { ApplicationView } from '../applications/applications.repository.ts';
 import { applicationIdSchema } from '../applications/applications.schema.ts';
+import type { ServiceTypesRepository } from '../service-types/service-types.repository.ts';
 import type { User } from '../users/users.repository.ts';
+import type { LetterPdfQueue } from './letter-pdf.queue.ts';
 import type { IssuedLetter, LettersRepository } from './letters.repository.ts';
 import { issueLetterSchema, verificationCodeSchema } from './letters.schema.ts';
 
 export interface LettersServiceDeps {
   letters: LettersRepository;
   access: ApplicationAccess;
+  serviceTypes: ServiceTypesRepository;
+  queue: LetterPdfQueue;
+  storage: FileStorage;
+  logger: Logger;
 }
 
 export class LettersService {
@@ -37,6 +45,7 @@ export class LettersService {
     if (staff.wardId === null)
       throw new AppError(403, 'FORBIDDEN', 'Only ward staff issue letters');
 
+    const serviceType = await this.#deps.serviceTypes.find(application.serviceType.id);
     // Nepal's date, not the server's: a letter issued at 1 am in Kathmandu carries that day.
     const today = BsDateHelper.today();
     const letter = await this.#deps.letters.issue({
@@ -46,7 +55,7 @@ export class LettersService {
       fiscalYear: BsDateHelper.fiscalYear(today).label,
       issuedDateBs: BsDateHelper.format(today),
       verificationCode: CodeHelper.random(10),
-      snapshot: this.#snapshot(application),
+      snapshot: this.#snapshot(application, serviceType?.formFields ?? []),
       issuedBy: staff.id,
     });
     if (!letter) {
@@ -56,7 +65,24 @@ export class LettersService {
         'This application changed since you loaded it; reload it',
       );
     }
+    // The letter is already committed; if queueing fails, the worker re-queues it on start.
+    await this.#deps.queue.enqueue(letter.id).catch((err: Error) => {
+      this.#deps.logger.error(
+        { letterId: letter.id, err: err.message },
+        'could not queue letter pdf',
+      );
+    });
     return letter;
+  }
+
+  async pdf(user: User, applicationId: unknown): Promise<{ letter: IssuedLetter; data: Buffer }> {
+    const letter = await this.forApplication(user, applicationId);
+    if (!letter.pdfStorageKey) {
+      throw new AppError(409, 'CONFLICT', 'The PDF is still being prepared; try again shortly', {
+        headers: { 'Retry-After': '5' },
+      });
+    }
+    return { letter, data: await this.#deps.storage.get(letter.pdfStorageKey) };
   }
 
   async forApplication(user: User, applicationId: unknown): Promise<IssuedLetter> {
@@ -77,7 +103,7 @@ export class LettersService {
     return letter;
   }
 
-  #snapshot(application: ApplicationView): LetterSnapshot {
+  #snapshot(application: ApplicationView, formFields: readonly FormField[]): LetterSnapshot {
     const { localLevelCode, wardNo, tole, houseNo } = application.address;
     const localLevel = DivisionHelper.getLocalLevel(localLevelCode);
     const district = localLevel && DivisionHelper.getDistrict(localLevel.districtCode);
@@ -100,6 +126,14 @@ export class LettersService {
         houseNo,
       },
       formData: application.formData,
+      fields: formFields
+        .filter((field) => application.formData[field.key] !== undefined)
+        .map(({ key, labelNe, labelEn }) => ({
+          key,
+          labelNe,
+          labelEn,
+          value: application.formData[key] ?? '',
+        })),
     };
   }
 }

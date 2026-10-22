@@ -13,6 +13,7 @@ RUN pnpm install --frozen-lockfile --prod --filter @ward-sewa/api...
 
 COPY packages/nepal-utils/src packages/nepal-utils/src
 COPY apps/api/src apps/api/src
+COPY apps/api/assets apps/api/assets
 
 ENV NODE_ENV=production
 # The uploads volume inherits this ownership, so the non-root user can write to it.

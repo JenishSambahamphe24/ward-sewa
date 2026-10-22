@@ -45,6 +45,13 @@ export class LettersController {
     res.json({ letter: toView(letter) });
   };
 
+  pdf = async (req: Request, res: Response) => {
+    const { letter, data } = await this.#letters.pdf(RequestHelper.user(req), req.params.id);
+    res.attachment(`${letter.letterNo.replace('/', '-')}.pdf`);
+    res.set({ 'Content-Type': 'application/pdf', 'X-Content-Type-Options': 'nosniff' });
+    res.send(data);
+  };
+
   verify = async (req: Request, res: Response) => {
     res.json(toPublicView(await this.#letters.verify(req.params.code)));
   };

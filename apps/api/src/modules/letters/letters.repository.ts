@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import type { Db } from '../../db/client.ts';
 import { issuedLetters, letterCounters } from '../../db/schema/index.ts';
 import type { LetterSnapshot } from '../../db/schema/index.ts';
@@ -85,5 +85,30 @@ export class LettersRepository {
       .from(issuedLetters)
       .where(eq(issuedLetters.verificationCode, code));
     return letter ?? null;
+  }
+
+  async findById(id: number): Promise<IssuedLetter | null> {
+    const [letter] = await this.#db.select().from(issuedLetters).where(eq(issuedLetters.id, id));
+    return letter ?? null;
+  }
+
+  // First writer wins, so two workers racing on one letter can't both attach a PDF.
+  async attachPdf(id: number, storageKey: string): Promise<boolean> {
+    const updated = await this.#db
+      .update(issuedLetters)
+      .set({ pdfStorageKey: storageKey })
+      .where(and(eq(issuedLetters.id, id), isNull(issuedLetters.pdfStorageKey)))
+      .returning({ id: issuedLetters.id });
+    return updated.length === 1;
+  }
+
+  async idsMissingPdf(limit: number): Promise<number[]> {
+    const rows = await this.#db
+      .select({ id: issuedLetters.id })
+      .from(issuedLetters)
+      .where(isNull(issuedLetters.pdfStorageKey))
+      .orderBy(asc(issuedLetters.id))
+      .limit(limit);
+    return rows.map((row) => row.id);
   }
 }

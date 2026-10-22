@@ -62,6 +62,7 @@ services:
       REDIS_URL: redis://redis:6379
       AUTH_SECRET: dev-only-change-me-dev-only-change-me-0000
       UPLOAD_DIR: /data/uploads
+      PUBLIC_BASE_URL: http://localhost:3000
     volumes: [uploads-data:/data/uploads]
     ports: ['127.0.0.1:3000:3000']
     healthcheck:
@@ -72,6 +73,21 @@ services:
     depends_on:
       migrate: { condition: service_completed_successfully }
       mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ['node', 'apps/api/src/worker.ts']
+    environment:
+      DATABASE_URL: postgres://ward_sewa:ward_sewa_dev@postgres:5432/ward_sewa
+      REDIS_URL: redis://redis:6379
+      UPLOAD_DIR: /data/uploads
+      PUBLIC_BASE_URL: http://localhost:3000
+    volumes: [uploads-data:/data/uploads]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
 
 volumes:

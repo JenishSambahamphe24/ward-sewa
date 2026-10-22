@@ -12,7 +12,7 @@ packages/                # shared libraries
   config/                # @ward-sewa/config: eslint / prettier / tsconfig presets
   nepal-utils/           # @ward-sewa/nepal-utils: BS dates, Nepali numerals, divisions
 .github/                 # CI workflow, PR template
-docker-compose.yml       # postgres, mongo, redis, api
+docker-compose.yml       # postgres, mongo, redis, migrate, api, worker
 ```
 
 ## Working in this repo
