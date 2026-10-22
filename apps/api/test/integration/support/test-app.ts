@@ -1,19 +1,26 @@
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { Redis } from 'ioredis';
 import { pino } from 'pino';
 import { createApp } from '../../../src/app.ts';
+import type { AppDeps } from '../../../src/app.ts';
 import type { Db } from '../../../src/db/client.ts';
 import { users } from '../../../src/db/schema/index.ts';
+import { LocalFileStorage } from '../../../src/lib/file-storage.ts';
 import { SessionStore } from '../../../src/modules/auth/session.store.ts';
 
 export class TestApp {
-  static create(db: Db, redis: Redis) {
+  static create(db: Db, redis: Redis, overrides: Partial<AppDeps> = {}) {
     return createApp({
       logger: pino({ level: 'silent' }),
       db,
       redis,
       sms: { send: () => Promise.resolve() },
+      storage: new LocalFileStorage(mkdtempSync(join(tmpdir(), 'ward-sewa-uploads-'))),
       authSecret: 'test-secret-test-secret-test-secret',
       healthChecks: {},
+      ...overrides,
     });
   }
 

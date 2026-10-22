@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { MulterError } from 'multer';
 import { ZodError } from 'zod';
 import { AppError } from '../lib/app-error.ts';
 
@@ -30,6 +31,11 @@ function toAppError(err: unknown): AppError | null {
       return new AppError(409, 'CONFLICT', 'A record with these details already exists');
     case '23503':
       return new AppError(400, 'VALIDATION_FAILED', 'A referenced record does not exist');
+  }
+  if (err instanceof MulterError) {
+    return err.code === 'LIMIT_FILE_SIZE'
+      ? new AppError(413, 'PAYLOAD_TOO_LARGE', 'Files must be 5 MB or smaller')
+      : new AppError(400, 'VALIDATION_FAILED', 'Upload one file in the "file" field');
   }
   if (typeof err === 'object' && err !== null && 'type' in err) {
     if (err.type === 'entity.parse.failed') {

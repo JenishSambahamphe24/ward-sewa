@@ -12,5 +12,7 @@ export function applicationsRouter(
     .post('/applications', citizenOnly, controller.create)
     .get('/applications', citizenOnly, controller.list)
     .get('/applications/:id', citizenOnly, controller.get)
-    .patch('/applications/:id', citizenOnly, controller.update);
+    .patch('/applications/:id', citizenOnly, controller.update)
+    .post('/applications/:id/submit', citizenOnly, controller.submit)
+    .get('/applications/:id/history', citizenOnly, controller.history);
 }

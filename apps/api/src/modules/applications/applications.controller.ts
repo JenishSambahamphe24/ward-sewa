@@ -26,4 +26,13 @@ export class ApplicationsController {
     const user = RequestHelper.user(req);
     res.json({ application: await this.#applications.update(user, req.params.id, req.body) });
   };
+
+  submit = async (req: Request, res: Response) => {
+    const user = RequestHelper.user(req);
+    res.json({ application: await this.#applications.submit(user, req.params.id, req.body) });
+  };
+
+  history = async (req: Request, res: Response) => {
+    res.json({ history: await this.#applications.history(RequestHelper.user(req), req.params.id) });
+  };
 }

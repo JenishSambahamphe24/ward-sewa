@@ -1,10 +1,9 @@
 import { eq } from 'drizzle-orm';
-import { pino } from 'pino';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createApp } from '../../src/app.ts';
 import { users } from '../../src/db/schema/index.ts';
 import { DivisionsSeed } from '../../src/db/seeds/divisions.seed.ts';
+import { TestApp } from './support/test-app.ts';
 import { TestDb } from './support/test-db.ts';
 import { TestRedis } from './support/test-redis.ts';
 
@@ -12,13 +11,8 @@ const PHONE = '9841234567';
 const { pool, db } = TestDb.connect();
 const redis = TestRedis.connect();
 const sent: { phone: string; message: string }[] = [];
-const app = createApp({
-  logger: pino({ level: 'silent' }),
-  db,
-  redis,
+const app = TestApp.create(db, redis, {
   sms: { send: async (phone, message) => void sent.push({ phone, message }) },
-  authSecret: 'test-secret-test-secret-test-secret',
-  healthChecks: {},
 });
 
 const lastCode = () => /\d{6}/.exec(sent.at(-1)?.message ?? '')?.[0] ?? '';

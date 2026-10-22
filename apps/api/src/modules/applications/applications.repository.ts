@@ -2,7 +2,12 @@ import { randomBytes } from 'node:crypto';
 import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import type { Db } from '../../db/client.ts';
-import { applications, serviceTypes, wards } from '../../db/schema/index.ts';
+import {
+  applicationStatusHistory,
+  applications,
+  serviceTypes,
+  wards,
+} from '../../db/schema/index.ts';
 import type { ListApplicationsQuery } from './applications.schema.ts';
 
 export type ApplicationStatus = (typeof applications.$inferSelect)['status'];
@@ -30,6 +35,15 @@ export interface NewApplication {
   formData: Record<string, string>;
 }
 
+export interface StatusChange {
+  applicationId: number;
+  version: number;
+  from: ApplicationStatus;
+  to: ApplicationStatus;
+  actorId: number;
+  note?: string;
+}
+
 export interface ApplicationChanges {
   tole?: string;
   houseNo?: string;
@@ -51,12 +65,62 @@ export class ApplicationsRepository {
   }
 
   async create(values: NewApplication): Promise<number> {
-    const [row] = await this.#db
-      .insert(applications)
-      .values({ ...values, trackingNo: trackingNo() })
-      .returning({ id: applications.id });
-    if (!row) throw new Error('INSERT ... RETURNING returned no row');
-    return row.id;
+    return this.#db.transaction(async (tx) => {
+      const [row] = await tx
+        .insert(applications)
+        .values({ ...values, trackingNo: trackingNo() })
+        .returning({ id: applications.id });
+      if (!row) throw new Error('INSERT ... RETURNING returned no row');
+      await tx
+        .insert(applicationStatusHistory)
+        .values({ applicationId: row.id, toStatus: 'draft', actorId: values.citizenId });
+      return row.id;
+    });
+  }
+
+  // Status and its history row change together or not at all. Matching on `version` also
+  // proves the status is still `from`, since every status change bumps the version.
+  async transition(change: StatusChange): Promise<boolean> {
+    return this.#db.transaction(async (tx) => {
+      const updated = await tx
+        .update(applications)
+        .set({
+          status: change.to,
+          version: sql`${applications.version} + 1`,
+          ...(change.to === 'submitted' ? { submittedAt: new Date() } : {}),
+        })
+        .where(
+          and(
+            eq(applications.id, change.applicationId),
+            eq(applications.version, change.version),
+            eq(applications.status, change.from),
+          ),
+        )
+        .returning({ id: applications.id });
+      if (updated.length === 0) return false;
+
+      await tx.insert(applicationStatusHistory).values({
+        applicationId: change.applicationId,
+        fromStatus: change.from,
+        toStatus: change.to,
+        actorId: change.actorId,
+        note: change.note,
+      });
+      return true;
+    });
+  }
+
+  history(applicationId: number) {
+    return this.#db
+      .select({
+        fromStatus: applicationStatusHistory.fromStatus,
+        toStatus: applicationStatusHistory.toStatus,
+        note: applicationStatusHistory.note,
+        at: applicationStatusHistory.createdAt,
+      })
+      .from(applicationStatusHistory)
+      .where(eq(applicationStatusHistory.applicationId, applicationId))
+      .orderBy(applicationStatusHistory.createdAt, applicationStatusHistory.id);
   }
 
   async findForCitizen(citizenId: number, id: number): Promise<ApplicationView | null> {

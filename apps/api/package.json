@@ -20,6 +20,7 @@
     "express": "catalog:be",
     "ioredis": "catalog:be",
     "mongodb": "catalog:be",
+    "multer": "catalog:be",
     "pg": "catalog:be",
     "pino": "catalog:be",
     "pino-http": "catalog:be",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/express": "catalog:be",
+    "@types/multer": "catalog:be",
     "@types/node": "catalog:generic",
     "@types/pg": "catalog:be",
     "@types/supertest": "catalog:be",

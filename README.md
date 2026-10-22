@@ -75,7 +75,8 @@ boot with a readiness check on every push and pull request.
 - [x] OTP login with Redis: expiring hashed codes, rate limiting, revocable sessions
 - [x] Staff management by the municipality admin, scoped to their own municipality
 - [x] Service types per municipality; citizens create and edit draft applications with optimistic locking
-- [ ] Documents, submission and the review workflow with enforced status transitions
+- [x] Document uploads (type checked by content, 5 MB limit) and submission with status history
+- [ ] Staff review workflow with enforced status transitions
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
 - [ ] MongoDB: audit trail and notification log
 - [ ] Letter PDF in Nepali with QR code verification

@@ -25,6 +25,8 @@ export const updateApplicationSchema = z
     message: 'Send at least one of tole, houseNo, formData',
   });
 
+export const submitApplicationSchema = z.object({ version: z.number().int().positive() });
+
 export const listApplicationsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
