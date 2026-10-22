@@ -1,8 +1,13 @@
+import { and, eq } from 'drizzle-orm';
+import { pino } from 'pino';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { serviceTypes } from '../../src/db/schema/index.ts';
 import { DivisionsSeed } from '../../src/db/seeds/divisions.seed.ts';
 import { ServiceTypesSeed } from '../../src/db/seeds/service-types.seed.ts';
+import { RedisCache } from '../../src/lib/cache.ts';
+import { ServiceTypesRepository } from '../../src/modules/service-types/service-types.repository.ts';
+import { ServiceTypesService } from '../../src/modules/service-types/service-types.service.ts';
 import { TestApp } from './support/test-app.ts';
 import { TestDb } from './support/test-db.ts';
 import { TestRedis } from './support/test-redis.ts';
@@ -59,6 +64,39 @@ describe('GET /service-types', () => {
       'unmarried',
     ]);
     expect(res.body.serviceTypes[0].fee).toBe('100.00');
+  });
+
+  it('is cached in Redis: MISS, then HIT with a 10-minute TTL', async () => {
+    const url = `/service-types?localLevel=${KATHMANDU}`;
+    expect((await request(app).get(url)).headers['x-cache']).toBe('MISS');
+    const second = await request(app).get(url);
+    expect(second.headers['x-cache']).toBe('HIT');
+    expect(second.body.serviceTypes).toHaveLength(4);
+    const ttl = await redis.ttl(`cache:service-types:v1:${KATHMANDU}`);
+    expect(ttl).toBeGreaterThan(590);
+  });
+
+  it('stays stale until invalidated, then serves the change', async () => {
+    const url = `/service-types?localLevel=${KATHMANDU}`;
+    await request(app).get(url);
+    await db
+      .update(serviceTypes)
+      .set({ fee: '150.00' })
+      .where(and(eq(serviceTypes.localLevelCode, KATHMANDU), eq(serviceTypes.code, 'residence')));
+
+    expect((await request(app).get(url)).body.serviceTypes[0].fee).toBe('100.00');
+    await new ServiceTypesService({
+      serviceTypes: new ServiceTypesRepository(db),
+      cache: new RedisCache(redis, pino({ level: 'silent' })),
+    }).invalidate(KATHMANDU);
+    const fresh = await request(app).get(url);
+    expect(fresh.headers['x-cache']).toBe('MISS');
+    expect(fresh.body.serviceTypes[0].fee).toBe('150.00');
+
+    await db
+      .update(serviceTypes)
+      .set({ fee: '100.00' })
+      .where(and(eq(serviceTypes.localLevelCode, KATHMANDU), eq(serviceTypes.code, 'residence')));
   });
 
   it('requires a valid local level code', async () => {

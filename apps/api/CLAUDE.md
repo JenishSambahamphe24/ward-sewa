@@ -118,6 +118,14 @@ and enforced by a partial unique index.
 - Issue date and fiscal year come from `BsDateHelper.today()` (Nepal time).
 - `GET /verify/:code` is public and returns only what a verifier needs (no phone, no form data).
 
+## Caching
+
+- `RedisCache.getOrLoad(key, ttl, load)` is cache-aside: Redis errors fall back to `load` with a
+  warning, so the cache can never take an endpoint down.
+- Keys: `cache:<thing>:v<n>:<id>`. Bump `v<n>` when the cached shape changes. Always set a TTL, and
+  call the owning service's `invalidate()` after a write.
+- `GET /service-types` is cached for 10 minutes per municipality; responses carry `X-Cache: HIT|MISS`.
+
 ## Letter PDFs (BullMQ)
 
 - Issuing queues a `render` job on the `letter-pdf` queue (`BullLetterPdfQueue`), after the letter

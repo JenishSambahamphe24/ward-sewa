@@ -1,29 +1,16 @@
 import type { Request, Response } from 'express';
-import { localLevelCodeSchema } from '../users/users.schema.ts';
-import type { ServiceTypesRepository } from './service-types.repository.ts';
+import type { ServiceTypesService } from './service-types.service.ts';
 
 export class ServiceTypesController {
-  readonly #serviceTypes: ServiceTypesRepository;
+  readonly #serviceTypes: ServiceTypesService;
 
-  constructor(serviceTypes: ServiceTypesRepository) {
+  constructor(serviceTypes: ServiceTypesService) {
     this.#serviceTypes = serviceTypes;
   }
 
   list = async (req: Request, res: Response) => {
-    const localLevelCode = localLevelCodeSchema.parse(req.query.localLevel);
-    const rows = await this.#serviceTypes.listActive(localLevelCode);
-    res.json({
-      serviceTypes: rows.map(
-        ({ id, code, nameEn, nameNe, fee, requiredDocuments, formFields }) => ({
-          id,
-          code,
-          nameEn,
-          nameNe,
-          fee,
-          requiredDocuments,
-          formFields,
-        }),
-      ),
-    });
+    const { value, hit } = await this.#serviceTypes.listActive(req.query.localLevel);
+    res.set('X-Cache', hit ? 'HIT' : 'MISS');
+    res.json({ serviceTypes: value });
   };
 }

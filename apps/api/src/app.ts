@@ -4,6 +4,7 @@ import type { Redis } from 'ioredis';
 import type { Logger } from 'pino';
 import { pinoHttp } from 'pino-http';
 import type { Db } from './db/client.ts';
+import { RedisCache } from './lib/cache.ts';
 import type { FileStorage } from './lib/file-storage.ts';
 import type { SmsGateway } from './lib/sms.ts';
 import type { LetterPdfQueue } from './modules/letters/letter-pdf.queue.ts';
@@ -36,6 +37,7 @@ import { ReviewService } from './modules/review/review.service.ts';
 import { ServiceTypesController } from './modules/service-types/service-types.controller.ts';
 import { ServiceTypesRepository } from './modules/service-types/service-types.repository.ts';
 import { serviceTypesRouter } from './modules/service-types/service-types.routes.ts';
+import { ServiceTypesService } from './modules/service-types/service-types.service.ts';
 import { StaffController } from './modules/staff/staff.controller.ts';
 import { StaffRepository } from './modules/staff/staff.repository.ts';
 import { staffRouter } from './modules/staff/staff.routes.ts';
@@ -80,7 +82,13 @@ export function createApp(deps: AppDeps): Express {
   app.use(healthRouter(deps.healthChecks, { timeoutMs: deps.healthTimeoutMs }));
   app.use(authRouter(new AuthController(auth), authenticated));
   app.use(usersRouter(new UsersController(new UsersService(users)), authenticated));
-  app.use(serviceTypesRouter(new ServiceTypesController(serviceTypes)));
+  app.use(
+    serviceTypesRouter(
+      new ServiceTypesController(
+        new ServiceTypesService({ serviceTypes, cache: new RedisCache(deps.redis, deps.logger) }),
+      ),
+    ),
+  );
   const applicationsRepository = new ApplicationsRepository(deps.db);
   const access = new ApplicationAccess(applicationsRepository);
   const applications = new ApplicationsService({
