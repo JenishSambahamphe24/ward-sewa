@@ -1,7 +1,7 @@
 import { DivisionHelper } from '@ward-sewa/nepal-utils';
 import { AppError } from '../../lib/app-error.ts';
 import type { User, UsersRepository } from './users.repository.ts';
-import { createMunicipalityAdminSchema } from './users.schema.ts';
+import { createMunicipalityAdminSchema, updateProfileSchema } from './users.schema.ts';
 import type { CreateMunicipalityAdminInput } from './users.schema.ts';
 
 export class UsersService {
@@ -22,5 +22,10 @@ export class UsersService {
     }
 
     return this.#users.create({ phone, name, role: 'municipality_admin', localLevelCode });
+  }
+
+  async updateProfile(user: User, input: unknown): Promise<User> {
+    const { name } = updateProfileSchema.parse(input);
+    return this.#users.update(user.id, { name });
   }
 }

@@ -61,6 +61,8 @@ services:
       MONGO_URL: mongodb://mongo:27017/ward_sewa
       REDIS_URL: redis://redis:6379
       AUTH_SECRET: dev-only-change-me-dev-only-change-me-0000
+      UPLOAD_DIR: /data/uploads
+    volumes: [uploads-data:/data/uploads]
     ports: ['127.0.0.1:3000:3000']
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health/live']
@@ -73,6 +75,7 @@ services:
       redis: { condition: service_healthy }
 
 volumes:
+  uploads-data:
   postgres-data:
   mongo-data:
   redis-data:

@@ -5,6 +5,7 @@ import { pino } from 'pino';
 import { createApp } from './app.ts';
 import { createDb } from './db/client.ts';
 import { EnvHelper } from './lib/env.helper.ts';
+import { LocalFileStorage } from './lib/file-storage.ts';
 import { LogSmsGateway } from './lib/sms.ts';
 
 const env = EnvHelper.load();
@@ -29,6 +30,7 @@ const app = createApp({
   db: createDb(pool),
   redis,
   sms: new LogSmsGateway(logger),
+  storage: new LocalFileStorage(env.UPLOAD_DIR),
   authSecret: env.AUTH_SECRET,
   healthChecks: {
     postgres: () => pool.query('SELECT 1'),

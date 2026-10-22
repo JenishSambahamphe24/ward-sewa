@@ -9,6 +9,7 @@ const envSchema = z.object({
   REDIS_URL: z.url(),
   AUTH_SECRET: z.string().min(32, 'Use at least 32 random characters'),
   SMS_GATEWAY: z.enum(['log']).default('log'),
+  UPLOAD_DIR: z.string().min(1).default('./uploads'),
 });
 
 export type Env = z.infer<typeof envSchema>;

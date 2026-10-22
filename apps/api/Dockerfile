@@ -15,6 +15,8 @@ COPY packages/nepal-utils/src packages/nepal-utils/src
 COPY apps/api/src apps/api/src
 
 ENV NODE_ENV=production
+# The uploads volume inherits this ownership, so the non-root user can write to it.
+RUN mkdir -p /data/uploads && chown node:node /data/uploads
 USER node
 EXPOSE 3000
 CMD ["node", "apps/api/src/server.ts"]

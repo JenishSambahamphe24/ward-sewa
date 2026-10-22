@@ -1,11 +1,10 @@
 import { eq } from 'drizzle-orm';
-import { pino } from 'pino';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createApp } from '../../src/app.ts';
 import { users } from '../../src/db/schema/index.ts';
 import { DivisionsSeed } from '../../src/db/seeds/divisions.seed.ts';
 import { SessionStore } from '../../src/modules/auth/session.store.ts';
+import { TestApp } from './support/test-app.ts';
 import { TestDb } from './support/test-db.ts';
 import { TestRedis } from './support/test-redis.ts';
 
@@ -14,14 +13,7 @@ const LALITPUR = 'NP0325101';
 const { pool, db } = TestDb.connect();
 const redis = TestRedis.connect();
 const sessions = new SessionStore(redis);
-const app = createApp({
-  logger: pino({ level: 'silent' }),
-  db,
-  redis,
-  sms: { send: () => Promise.resolve() },
-  authSecret: 'test-secret-test-secret-test-secret',
-  healthChecks: {},
-});
+const app = TestApp.create(db, redis);
 
 async function tokenFor(values: typeof users.$inferInsert): Promise<string> {
   const [user] = await db.insert(users).values(values).returning();
@@ -40,7 +32,7 @@ const secretary = { phone: '9841000101', name: 'Ram Thapa', role: 'ward_secretar
 beforeAll(() => DivisionsSeed.run(db));
 beforeEach(async () => {
   await redis.flushdb();
-  await db.delete(users);
+  await TestDb.reset(db);
   ktmAdmin = await tokenFor({
     phone: '9841000001',
     role: 'municipality_admin',

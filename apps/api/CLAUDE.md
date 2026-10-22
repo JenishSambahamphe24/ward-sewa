@@ -68,6 +68,32 @@ through `wards` filtered by the admin's `local_level_code`; another municipality
 admins themselves, return 404. One active chair per ward is checked in the service (friendly 409)
 and enforced by a partial unique index.
 
+## Service types and applications
+
+- `service_types` are per municipality (`local_level_code`); fee is `numeric` and leaves the API as a
+  string. `GET /service-types?localLevel=` is public. Demo data comes from
+  `db/seeds/service-types.seed.ts` (sample, Kathmandu and Lalitpur only).
+- Each service type defines its `formFields`; `FormDataHelper.schema(fields, { complete })`
+  validates `form_data`. Drafts may be partial; submit uses `complete: true`. Unknown keys are
+  rejected, BS dates are normalised to `YYYY-MM-DD`.
+- Citizens own applications: every query filters by `citizen_id`; someone else's is 404.
+- Edits send `version`; `updateEditable` matches `id + citizen_id + version + editable status` and
+  bumps the version. Zero rows → 409. Only `draft` and `needs_info` are editable.
+- Integration tests reset with `TestDb.reset(db)` (TRUNCATE … CASCADE), never `DELETE FROM users`.
+
+## Documents and submission
+
+- `POST /applications/:id/documents` (multipart: `documentCode` + `file`), only for codes the service
+  type requires, only while editable. Max 5 MB; the type is detected from the bytes
+  (`FileTypeHelper`), never the client's name or MIME. Uploading the same code again replaces it.
+- Files go through `FileStorage` (`LocalFileStorage` under `UPLOAD_DIR`; swappable for S3) under a
+  random key. Write the file first, then the row; delete the file if the row fails.
+- Downloads are owner-checked and sent as attachments with `X-Content-Type-Options: nosniff`.
+- `POST /applications/:id/submit` needs the citizen's name, every required field
+  (`FormDataHelper` with `complete: true`) and every required document; errors list what's missing.
+- Every status change goes through `ApplicationsRepository.transition`, which updates the status
+  and writes `application_status_history` in one transaction, matching on `version`.
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the
@@ -83,7 +109,9 @@ pnpm admin:create --phone 98XXXXXXXX --local-level NP0327101 --name "..."   # fi
 
 - Drizzle with `casing: 'snake_case'`: camelCase in TypeScript, snake_case in SQL. Name
   constraints explicitly.
-- Never edit a committed migration. A schema change is a new migration.
+- Never edit or regenerate a migration once it has been applied anywhere, even to your own dev
+  database: Drizzle tracks applied migrations by the journal timestamp, so a regenerated file
+  looks new and runs again. A schema change is a new migration.
 - Location lookup tables (`provinces`, `districts`, `local_levels`, `wards`) are seeded from
   `@ward-sewa/nepal-utils`. P-codes are their keys; `wards.id` is what other tables reference.
 

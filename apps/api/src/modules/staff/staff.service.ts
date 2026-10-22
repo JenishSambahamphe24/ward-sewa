@@ -1,4 +1,5 @@
 import { AppError } from '../../lib/app-error.ts';
+import type { WardsRepository } from '../divisions/wards.repository.ts';
 import type { User, UsersRepository } from '../users/users.repository.ts';
 import type { StaffMember, StaffRepository } from './staff.repository.ts';
 import {
@@ -11,6 +12,7 @@ import {
 export interface StaffServiceDeps {
   staff: StaffRepository;
   users: UsersRepository;
+  wards: WardsRepository;
 }
 
 const chairTaken = (wardNo: number) =>
@@ -78,7 +80,7 @@ export class StaffService {
   }
 
   async #wardId(localLevelCode: string, wardNo: number): Promise<number> {
-    const wardId = await this.#deps.staff.findWardId(localLevelCode, wardNo);
+    const wardId = await this.#deps.wards.findId(localLevelCode, wardNo);
     if (wardId === null) {
       throw new AppError(400, 'VALIDATION_FAILED', `Ward ${wardNo} does not exist here`);
     }

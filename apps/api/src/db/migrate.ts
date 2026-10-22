@@ -5,6 +5,7 @@ import { pino } from 'pino';
 import { EnvHelper } from '../lib/env.helper.ts';
 import { createDb } from './client.ts';
 import { DivisionsSeed } from './seeds/divisions.seed.ts';
+import { ServiceTypesSeed } from './seeds/service-types.seed.ts';
 
 export const MIGRATIONS_FOLDER = fileURLToPath(new URL('./migrations', import.meta.url));
 
@@ -17,7 +18,8 @@ if (import.meta.main) {
     logger.info('migrations applied');
     if (process.argv.includes('--seed')) {
       await DivisionsSeed.run(db);
-      logger.info('divisions seeded');
+      await ServiceTypesSeed.run(db);
+      logger.info('divisions and sample service types seeded');
     }
   } finally {
     await pool.end();

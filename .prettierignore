@@ -2,3 +2,4 @@ pnpm-lock.yaml
 coverage/
 packages/nepal-utils/src/data/divisions.json
 apps/api/src/db/migrations/
+.claude/

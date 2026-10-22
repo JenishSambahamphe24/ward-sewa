@@ -14,4 +14,6 @@ export const createMunicipalityAdminSchema = z.object({
   name: z.string().trim().min(1).max(100),
 });
 
+export const updateProfileSchema = z.object({ name: z.string().trim().min(1).max(100) });
+
 export type CreateMunicipalityAdminInput = z.input<typeof createMunicipalityAdminSchema>;

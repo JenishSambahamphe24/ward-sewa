@@ -71,14 +71,6 @@ export class StaffRepository {
     }));
   }
 
-  async findWardId(localLevelCode: string, wardNo: number): Promise<number | null> {
-    const [ward] = await this.#db
-      .select({ id: wards.id })
-      .from(wards)
-      .where(and(eq(wards.localLevelCode, localLevelCode), eq(wards.wardNo, wardNo)));
-    return ward?.id ?? null;
-  }
-
   async hasActiveChair(wardId: number, exceptUserId?: number): Promise<boolean> {
     const [chair] = await this.#db
       .select({ id: users.id })
