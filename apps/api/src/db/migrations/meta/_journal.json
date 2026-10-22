@@ -29,6 +29,13 @@
       "when": 1792641110120,
       "tag": "0003_documents_status_history",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792642694683,
+      "tag": "0004_issued_letters",
+      "breakpoints": true
     }
   ]
 }

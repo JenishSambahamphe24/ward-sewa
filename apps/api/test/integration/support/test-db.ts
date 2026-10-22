@@ -15,6 +15,6 @@ export class TestDb {
 
   // Clears everything users own in one statement, so foreign keys never block a reset.
   static async reset(db: Db): Promise<void> {
-    await db.execute(sql`TRUNCATE applications, users RESTART IDENTITY CASCADE`);
+    await db.execute(sql`TRUNCATE applications, users, letter_counters RESTART IDENTITY CASCADE`);
   }
 }

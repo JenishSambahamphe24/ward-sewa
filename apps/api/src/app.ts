@@ -25,6 +25,10 @@ import { documentsRouter } from './modules/documents/documents.routes.ts';
 import { DocumentsService } from './modules/documents/documents.service.ts';
 import { healthRouter } from './modules/health/health.routes.ts';
 import type { HealthCheck } from './modules/health/health.routes.ts';
+import { LettersController } from './modules/letters/letters.controller.ts';
+import { LettersRepository } from './modules/letters/letters.repository.ts';
+import { lettersRouter } from './modules/letters/letters.routes.ts';
+import { LettersService } from './modules/letters/letters.service.ts';
 import { ReviewController } from './modules/review/review.controller.ts';
 import { reviewRouter } from './modules/review/review.routes.ts';
 import { ReviewService } from './modules/review/review.service.ts';
@@ -102,6 +106,17 @@ export function createApp(deps: AppDeps): Express {
   app.use(
     reviewRouter(
       new ReviewController(new ReviewService({ applications: applicationsRepository, access })),
+      authenticated,
+    ),
+  );
+  app.use(
+    lettersRouter(
+      new LettersController(
+        new LettersService({
+          letters: new LettersRepository(deps.db, applicationsRepository),
+          access,
+        }),
+      ),
       authenticated,
     ),
   );
