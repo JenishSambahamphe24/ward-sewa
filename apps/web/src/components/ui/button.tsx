@@ -1,6 +1,6 @@
-import { Slot } from 'radix-ui';
 import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
+import { Slot } from 'radix-ui';
 import type { ComponentProps } from 'react';
 import { cn } from '@/lib/cn.ts';
 
@@ -11,6 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         accent: 'bg-accent text-accent-foreground hover:bg-accent/90',
+        highlight: 'bg-highlight text-highlight-foreground hover:bg-highlight/90',
         danger: 'bg-danger text-danger-foreground hover:bg-danger/90',
         outline: 'border border-border bg-surface hover:bg-muted',
         ghost: 'hover:bg-muted',

@@ -4,49 +4,50 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: oklch(0.985 0.002 250);
-  --foreground: oklch(0.21 0.03 260);
-  --surface: oklch(1 0 0);
+  /* Dhaka heritage: three brand colours (maroon, teal, mustard) on warm cream neutrals. */
+  --background: #fbf8f3;
+  --foreground: #2a1f1b;
+  --surface: #fffdf9;
   --surface-foreground: var(--foreground);
-  --muted: oklch(0.955 0.005 250);
-  --muted-foreground: oklch(0.5 0.02 260);
-  --border: oklch(0.9 0.01 255);
-  --input: oklch(0.88 0.01 255);
-  --ring: oklch(0.55 0.2 25);
-  /* Nepal's flag: crimson for primary actions, deep blue for accents. */
-  --primary: oklch(0.53 0.21 25);
-  --primary-foreground: oklch(0.99 0 0);
-  --accent: oklch(0.36 0.16 264);
-  --accent-foreground: oklch(0.99 0 0);
-  --danger: oklch(0.55 0.22 27);
-  --danger-foreground: oklch(0.99 0 0);
-  --success: oklch(0.55 0.15 150);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.78 0.16 75);
-  --warning-foreground: oklch(0.25 0.05 75);
+  --muted: #f3eee6;
+  --muted-foreground: #6b6158;
+  --border: #e7dfd3;
+  --input: #ddd3c5;
+  --ring: #7a1f2b;
+  --primary: #7a1f2b;
+  --primary-foreground: #fbf8f3;
+  --accent: #0f766e;
+  --accent-foreground: #fbf8f3;
+  /* Mustard fails contrast with light text (2.6:1): fill only, always with ink text. */
+  --highlight: #c9932b;
+  --highlight-foreground: #16120f;
+  /* Status colours reuse the brand colours, so the UI never adds a fourth hue. */
+  --danger: var(--primary);
+  --danger-foreground: var(--primary-foreground);
+  --success: var(--accent);
+  --success-foreground: var(--accent-foreground);
+  --warning: var(--highlight);
+  --warning-foreground: var(--highlight-foreground);
+  --overlay: rgb(22 18 15 / 0.55);
   --radius: 0.625rem;
 }
 
 .dark {
-  --background: oklch(0.17 0.02 262);
-  --foreground: oklch(0.96 0.01 255);
-  --surface: oklch(0.22 0.025 262);
+  --background: #16120f;
+  --foreground: #f4eee7;
+  --surface: #1f1a16;
   --surface-foreground: var(--foreground);
-  --muted: oklch(0.27 0.025 262);
-  --muted-foreground: oklch(0.72 0.02 255);
-  --border: oklch(0.32 0.025 262);
-  --input: oklch(0.36 0.025 262);
-  --ring: oklch(0.65 0.19 25);
-  --primary: oklch(0.63 0.2 25);
-  --primary-foreground: oklch(0.99 0 0);
-  --accent: oklch(0.62 0.14 264);
-  --accent-foreground: oklch(0.15 0.02 262);
-  --danger: oklch(0.65 0.2 27);
-  --danger-foreground: oklch(0.99 0 0);
-  --success: oklch(0.68 0.15 150);
-  --success-foreground: oklch(0.15 0.02 150);
-  --warning: oklch(0.82 0.15 75);
-  --warning-foreground: oklch(0.2 0.05 75);
+  --muted: #2a2420;
+  --muted-foreground: #b5aaa0;
+  --border: #3a322c;
+  --input: #463d36;
+  --ring: #e07a87;
+  --primary: #e07a87;
+  --primary-foreground: #16120f;
+  --accent: #4fd1c5;
+  --accent-foreground: #16120f;
+  --highlight: #e8b85a;
+  --highlight-foreground: #16120f;
 }
 
 @theme inline {
@@ -63,6 +64,9 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-overlay: var(--overlay);
   --color-danger: var(--danger);
   --color-danger-foreground: var(--danger-foreground);
   --color-success: var(--success);

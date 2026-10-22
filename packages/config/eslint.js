@@ -33,6 +33,11 @@ export default defineConfig(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-extraneous-class': ['error', { allowStaticOnly: true }],
+      // Props are always a named interface, even when it only extends another type.
+      '@typescript-eslint/no-empty-object-type': [
+        'error',
+        { allowInterfaces: 'with-single-extends' },
+      ],
       'no-console': 'error',
     },
   },
