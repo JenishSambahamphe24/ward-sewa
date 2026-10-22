@@ -4,6 +4,7 @@ import type { DocumentsRepository } from '../documents/documents.repository.ts';
 import { FormDataHelper } from '../service-types/form-data.helper.ts';
 import type { ServiceTypesRepository } from '../service-types/service-types.repository.ts';
 import type { User } from '../users/users.repository.ts';
+import type { ApplicationAccess } from './application-access.ts';
 import { EDITABLE_STATUSES } from './applications.repository.ts';
 import type { ApplicationsRepository, ApplicationView } from './applications.repository.ts';
 import {
@@ -19,6 +20,7 @@ export interface ApplicationsServiceDeps {
   serviceTypes: ServiceTypesRepository;
   wards: WardsRepository;
   documents: DocumentsRepository;
+  access: ApplicationAccess;
 }
 
 export class ApplicationsService {
@@ -151,15 +153,13 @@ export class ApplicationsService {
     return this.#mustFind(citizen, current.id);
   }
 
-  async history(citizen: User, id: unknown) {
-    const application = await this.#mustFind(citizen, applicationIdSchema.parse(id));
+  // Shared by the applicant and their ward's staff.
+  async history(user: User, id: unknown) {
+    const application = await this.#deps.access.find(user, applicationIdSchema.parse(id));
     return this.#deps.applications.history(application.id);
   }
 
-  // Another citizen's application is a 404: its existence is not theirs to know.
-  async #mustFind(citizen: User, id: number): Promise<ApplicationView> {
-    const application = await this.#deps.applications.findForCitizen(citizen.id, id);
-    if (!application) throw new AppError(404, 'NOT_FOUND', 'No such application');
-    return application;
+  #mustFind(citizen: User, id: number): Promise<ApplicationView> {
+    return this.#deps.access.find(citizen, id);
   }
 }

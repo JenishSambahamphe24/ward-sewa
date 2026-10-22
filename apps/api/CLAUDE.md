@@ -94,6 +94,18 @@ and enforced by a partial unique index.
 - Every status change goes through `ApplicationsRepository.transition`, which updates the status
   and writes `application_status_history` in one transaction, matching on `version`.
 
+## Review workflow
+
+- `ApplicationAccess.find(user, id)` is the single rule for who may see an application: the
+  applicant, or staff of its ward once submitted (staff never see drafts). Everything else is 404.
+  Documents and history use it, so ward staff can read them too; only the applicant uploads.
+- `GET /staff/applications` is the ward queue (oldest first, filter by status and service type),
+  served by the `(ward_id, status, created_at)` index.
+- `POST /staff/applications/:id/transition { to, version, note? }` follows the `TRANSITIONS` table
+  in `review.service.ts`. Wrong role → 403, step not allowed from the current status → 409, missing
+  required note → 400, stale version → 409. Only the chair approves; the municipality admin can't
+  review at all (separation of duties).
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the

@@ -14,5 +14,10 @@ export function applicationsRouter(
     .get('/applications/:id', citizenOnly, controller.get)
     .patch('/applications/:id', citizenOnly, controller.update)
     .post('/applications/:id/submit', citizenOnly, controller.submit)
-    .get('/applications/:id/history', citizenOnly, controller.history);
+    .get(
+      '/applications/:id/history',
+      requireAuth,
+      requireRole('citizen', 'ward_secretary', 'ward_chair'),
+      controller.history,
+    );
 }

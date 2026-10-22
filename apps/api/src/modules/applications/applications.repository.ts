@@ -1,14 +1,15 @@
 import { randomBytes } from 'node:crypto';
-import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import type { Db } from '../../db/client.ts';
 import {
   applicationStatusHistory,
   applications,
   serviceTypes,
+  users,
   wards,
 } from '../../db/schema/index.ts';
-import type { ListApplicationsQuery } from './applications.schema.ts';
+import type { ListApplicationsQuery, WardQueueQuery } from './applications.schema.ts';
 
 export type ApplicationStatus = (typeof applications.$inferSelect)['status'];
 export const EDITABLE_STATUSES: ApplicationStatus[] = ['draft', 'needs_info'];
@@ -18,6 +19,7 @@ export interface ApplicationView {
   trackingNo: string;
   status: ApplicationStatus;
   version: number;
+  applicant: { id: number; name: string | null; phone: string };
   serviceType: { id: number; code: string; nameEn: string; nameNe: string; fee: string };
   address: { localLevelCode: string; wardNo: number; tole: string; houseNo: string | null };
   formData: Record<string, string>;
@@ -148,6 +150,39 @@ export class ApplicationsRepository {
     return { items, total: totals?.total ?? 0 };
   }
 
+  // Staff never see drafts: an unsubmitted application is still the citizen's own.
+  async findForWard(wardId: number, id: number): Promise<ApplicationView | null> {
+    const [application] = await this.#select(
+      ...this.#wardScope(wardId),
+      eq(applications.id, id),
+    ).limit(1);
+    return application ?? null;
+  }
+
+  async listForWard(
+    wardId: number,
+    { status, serviceTypeId, page, limit }: WardQueueQuery,
+  ): Promise<{ items: ApplicationView[]; total: number }> {
+    const conditions = [
+      ...this.#wardScope(wardId),
+      status ? eq(applications.status, status) : undefined,
+      serviceTypeId ? eq(applications.serviceTypeId, serviceTypeId) : undefined,
+    ].filter((condition): condition is SQL => condition !== undefined);
+
+    const [items, [totals]] = await Promise.all([
+      // Oldest first: the queue is served in the order citizens applied.
+      this.#select(...conditions)
+        .orderBy(asc(applications.createdAt), asc(applications.id))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      this.#db
+        .select({ total: count() })
+        .from(applications)
+        .where(and(...conditions)),
+    ]);
+    return { items, total: totals?.total ?? 0 };
+  }
+
   // Optimistic lock: matches only if nobody changed the row since the client read `version`.
   async updateEditable(
     citizenId: number,
@@ -170,6 +205,10 @@ export class ApplicationsRepository {
     return updated.length === 1;
   }
 
+  #wardScope(wardId: number): SQL[] {
+    return [eq(applications.wardId, wardId), ne(applications.status, 'draft')];
+  }
+
   #select(...conditions: SQL[]) {
     return this.#db
       .select({
@@ -177,6 +216,7 @@ export class ApplicationsRepository {
         trackingNo: applications.trackingNo,
         status: applications.status,
         version: applications.version,
+        applicant: { id: users.id, name: users.name, phone: users.phone },
         serviceType: {
           id: serviceTypes.id,
           code: serviceTypes.code,
@@ -198,6 +238,7 @@ export class ApplicationsRepository {
       .from(applications)
       .innerJoin(serviceTypes, eq(applications.serviceTypeId, serviceTypes.id))
       .innerJoin(wards, eq(applications.wardId, wards.id))
+      .innerJoin(users, eq(applications.citizenId, users.id))
       .where(and(...conditions))
       .$dynamic();
   }

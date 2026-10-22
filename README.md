@@ -76,7 +76,8 @@ boot with a readiness check on every push and pull request.
 - [x] Staff management by the municipality admin, scoped to their own municipality
 - [x] Service types per municipality; citizens create and edit draft applications with optimistic locking
 - [x] Document uploads (type checked by content, 5 MB limit) and submission with status history
-- [ ] Staff review workflow with enforced status transitions
+- [x] Staff review workflow: ward-scoped queue, role-checked transitions, notes, status history
+- [ ] Issuing letters: official letter numbers, PDF with QR verification
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
 - [ ] MongoDB: audit trail and notification log
 - [ ] Letter PDF in Nepali with QR code verification

@@ -8,6 +8,7 @@ import type { FileStorage } from './lib/file-storage.ts';
 import type { SmsGateway } from './lib/sms.ts';
 import { requireAuth } from './middleware/auth.ts';
 import { errorHandler, notFound } from './middleware/error-handler.ts';
+import { ApplicationAccess } from './modules/applications/application-access.ts';
 import { ApplicationsController } from './modules/applications/applications.controller.ts';
 import { ApplicationsRepository } from './modules/applications/applications.repository.ts';
 import { applicationsRouter } from './modules/applications/applications.routes.ts';
@@ -24,6 +25,9 @@ import { documentsRouter } from './modules/documents/documents.routes.ts';
 import { DocumentsService } from './modules/documents/documents.service.ts';
 import { healthRouter } from './modules/health/health.routes.ts';
 import type { HealthCheck } from './modules/health/health.routes.ts';
+import { ReviewController } from './modules/review/review.controller.ts';
+import { reviewRouter } from './modules/review/review.routes.ts';
+import { ReviewService } from './modules/review/review.service.ts';
 import { ServiceTypesController } from './modules/service-types/service-types.controller.ts';
 import { ServiceTypesRepository } from './modules/service-types/service-types.repository.ts';
 import { serviceTypesRouter } from './modules/service-types/service-types.routes.ts';
@@ -71,18 +75,33 @@ export function createApp(deps: AppDeps): Express {
   app.use(authRouter(new AuthController(auth), authenticated));
   app.use(usersRouter(new UsersController(new UsersService(users)), authenticated));
   app.use(serviceTypesRouter(new ServiceTypesController(serviceTypes)));
+  const applicationsRepository = new ApplicationsRepository(deps.db);
+  const access = new ApplicationAccess(applicationsRepository);
   const applications = new ApplicationsService({
-    applications: new ApplicationsRepository(deps.db),
+    applications: applicationsRepository,
     serviceTypes,
     wards,
     documents,
+    access,
   });
   app.use(applicationsRouter(new ApplicationsController(applications), authenticated));
   app.use(
     documentsRouter(
       new DocumentsController(
-        new DocumentsService({ applications, serviceTypes, documents, storage: deps.storage }),
+        new DocumentsService({
+          applications,
+          access,
+          serviceTypes,
+          documents,
+          storage: deps.storage,
+        }),
       ),
+      authenticated,
+    ),
+  );
+  app.use(
+    reviewRouter(
+      new ReviewController(new ReviewService({ applications: applicationsRepository, access })),
       authenticated,
     ),
   );
