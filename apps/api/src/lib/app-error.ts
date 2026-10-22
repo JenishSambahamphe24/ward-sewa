@@ -5,6 +5,7 @@ export type ErrorCode =
   | 'UNAUTHENTICATED'
   | 'FORBIDDEN'
   | 'CONFLICT'
+  | 'IDEMPOTENCY_KEY_REUSED'
   | 'PAYLOAD_TOO_LARGE'
   | 'RATE_LIMITED'
   | 'INTERNAL_ERROR';

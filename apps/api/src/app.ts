@@ -10,6 +10,7 @@ import type { SmsGateway } from './lib/sms.ts';
 import type { LetterPdfQueue } from './modules/letters/letter-pdf.queue.ts';
 import { requireAuth } from './middleware/auth.ts';
 import { errorHandler, notFound } from './middleware/error-handler.ts';
+import { idempotent } from './middleware/idempotency.ts';
 import { DEFAULT_RATE_LIMITS, rateLimit } from './middleware/rate-limit.ts';
 import type { RateLimits } from './middleware/rate-limit.ts';
 import { ApplicationAccess } from './modules/applications/application-access.ts';
@@ -109,7 +110,13 @@ export function createApp(deps: AppDeps): Express {
     documents,
     access,
   });
-  app.use(applicationsRouter(new ApplicationsController(applications), authenticated));
+  app.use(
+    applicationsRouter(
+      new ApplicationsController(applications),
+      authenticated,
+      idempotent(deps.redis, deps.logger),
+    ),
+  );
   app.use(
     documentsRouter(
       new DocumentsController(

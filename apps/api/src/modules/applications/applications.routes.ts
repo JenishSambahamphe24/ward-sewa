@@ -6,10 +6,11 @@ import type { ApplicationsController } from './applications.controller.ts';
 export function applicationsRouter(
   controller: ApplicationsController,
   requireAuth: RequestHandler,
+  idempotent: RequestHandler,
 ): Router {
   const citizenOnly = [requireAuth, requireRole('citizen')];
   return Router()
-    .post('/applications', citizenOnly, controller.create)
+    .post('/applications', citizenOnly, idempotent, controller.create)
     .get('/applications', citizenOnly, controller.list)
     .get('/applications/:id', citizenOnly, controller.get)
     .patch('/applications/:id', citizenOnly, controller.update)

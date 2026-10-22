@@ -137,6 +137,17 @@ and enforced by a partial unique index.
 - `TRUST_PROXY` = number of proxies in front. Keep it 0 without a proxy: trusting
   `X-Forwarded-For` otherwise lets clients fake their IP and bypass every limit.
 
+## Idempotency keys
+
+- `idempotent(redis, logger)` (`middleware/idempotency.ts`) on `POST /applications`, after
+  `requireAuth`. Optional `Idempotency-Key` header (8–128 of `A-Za-z0-9_-`), scoped per user.
+- Claim with `SET idem:<user>:<key> processing NX EX 60`; a 2xx response is stored for 24 h and
+  replayed (`Idempotent-Replayed: true`); errors free the key. Same key + different body → 422
+  `IDEMPOTENCY_KEY_REUSED`; still processing → 409 with `Retry-After: 1`.
+- The outcome is stored before the response is sent. Redis down → passes through with a warning
+  (a duplicate draft is harmless; anything involving money should refuse instead).
+- Add it to any new endpoint that creates something a client might retry.
+
 ## Letter PDFs (BullMQ)
 
 - Issuing queues a `render` job on the `letter-pdf` queue (`BullLetterPdfQueue`), after the letter

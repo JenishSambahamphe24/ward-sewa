@@ -81,7 +81,8 @@ boot with a readiness check on every push and pull request.
 - [x] Letter PDF in Nepali with a QR verification code, rendered by a BullMQ worker
 - [x] Redis caching (cache-aside, falls back to the database if Redis is down)
 - [x] Redis rate limiting: per IP and per user, RateLimit headers, safe behind proxies
-- [ ] Redis: idempotency keys, BullMQ SMS job
+- [x] Idempotency keys: a retried POST /applications creates exactly one application
+- [ ] BullMQ SMS job (replacing the development log gateway)
 - [ ] MongoDB: audit trail and notification log
 - [ ] React citizen portal and staff dashboard
 - [ ] OpenAPI documentation
