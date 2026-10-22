@@ -7,6 +7,7 @@ import { createDb } from './db/client.ts';
 import { EnvHelper } from './lib/env.helper.ts';
 import { LocalFileStorage } from './lib/file-storage.ts';
 import { LogSmsGateway } from './lib/sms.ts';
+import { BullLetterPdfQueue } from './modules/letters/letter-pdf.queue.ts';
 
 const env = EnvHelper.load();
 const logger = pino({ level: env.LOG_LEVEL });
@@ -25,12 +26,15 @@ try {
   logger.warn({ err: (err as Error).message }, 'mongo unavailable at startup; will keep retrying');
 }
 
+const letterPdfQueue = new BullLetterPdfQueue(redis);
+
 const app = createApp({
   logger,
   db: createDb(pool),
   redis,
   sms: new LogSmsGateway(logger),
   storage: new LocalFileStorage(env.UPLOAD_DIR),
+  letterPdfQueue,
   authSecret: env.AUTH_SECRET,
   healthChecks: {
     postgres: () => pool.query('SELECT 1'),
@@ -47,7 +51,8 @@ function shutdown(signal: NodeJS.Signals): void {
   logger.info({ signal }, 'shutting down');
   const forceExit = setTimeout(() => process.exit(1), 10_000).unref();
   server.close(async () => {
-    await Promise.allSettled([pool.end(), mongo.close(), redis.quit()]);
+    await Promise.allSettled([letterPdfQueue.close(), pool.end(), mongo.close()]);
+    await redis.quit();
     clearTimeout(forceExit);
     process.exit(0);
   });

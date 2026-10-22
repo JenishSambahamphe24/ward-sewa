@@ -13,6 +13,7 @@ export class UnitDeps {
       redis: {} as Redis,
       sms: { send: () => Promise.resolve() },
       storage: {} as FileStorage,
+      letterPdfQueue: { enqueue: () => Promise.resolve() },
       authSecret: 'x'.repeat(32),
       healthChecks: {},
       ...overrides,

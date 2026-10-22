@@ -78,7 +78,7 @@ boot with a readiness check on every push and pull request.
 - [x] Document uploads (type checked by content, 5 MB limit) and submission with status history
 - [x] Staff review workflow: ward-scoped queue, role-checked transitions, notes, status history
 - [x] Issuing letters: gap-free numbers per ward and fiscal year, frozen snapshot, public verification
-- [ ] Letter PDF with QR code, rendered by a BullMQ worker
+- [x] Letter PDF in Nepali with a QR verification code, rendered by a BullMQ worker
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
 - [ ] MongoDB: audit trail and notification log
 - [ ] React citizen portal and staff dashboard

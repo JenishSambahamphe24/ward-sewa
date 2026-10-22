@@ -17,5 +17,11 @@ export function lettersRouter(controller: LettersController, requireAuth: Reques
       requireRole('citizen', 'ward_secretary', 'ward_chair'),
       controller.forApplication,
     )
+    .get(
+      '/applications/:id/letter/pdf',
+      requireAuth,
+      requireRole('citizen', 'ward_secretary', 'ward_chair'),
+      controller.pdf,
+    )
     .get('/verify/:code', controller.verify);
 }

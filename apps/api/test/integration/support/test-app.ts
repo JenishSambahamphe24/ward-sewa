@@ -18,6 +18,7 @@ export class TestApp {
       redis,
       sms: { send: () => Promise.resolve() },
       storage: new LocalFileStorage(mkdtempSync(join(tmpdir(), 'ward-sewa-uploads-'))),
+      letterPdfQueue: { enqueue: () => Promise.resolve() },
       authSecret: 'test-secret-test-secret-test-secret',
       healthChecks: {},
       ...overrides,

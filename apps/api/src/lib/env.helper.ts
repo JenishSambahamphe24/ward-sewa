@@ -10,6 +10,7 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().min(32, 'Use at least 32 random characters'),
   SMS_GATEWAY: z.enum(['log']).default('log'),
   UPLOAD_DIR: z.string().min(1).default('./uploads'),
+  PUBLIC_BASE_URL: z.url().default('http://localhost:3000'),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -21,6 +22,19 @@ export class EnvHelper {
 
   static loadDatabase(source: NodeJS.ProcessEnv = process.env): Pick<Env, 'DATABASE_URL'> {
     return EnvHelper.parse(envSchema.pick({ DATABASE_URL: true }), source);
+  }
+
+  static loadWorker(source: NodeJS.ProcessEnv = process.env) {
+    return EnvHelper.parse(
+      envSchema.pick({
+        LOG_LEVEL: true,
+        DATABASE_URL: true,
+        REDIS_URL: true,
+        UPLOAD_DIR: true,
+        PUBLIC_BASE_URL: true,
+      }),
+      source,
+    );
   }
 
   private static parse<T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T {

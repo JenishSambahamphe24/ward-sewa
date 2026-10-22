@@ -118,6 +118,20 @@ and enforced by a partial unique index.
 - Issue date and fiscal year come from `BsDateHelper.today()` (Nepal time).
 - `GET /verify/:code` is public and returns only what a verifier needs (no phone, no form data).
 
+## Letter PDFs (BullMQ)
+
+- Issuing queues a `render` job on the `letter-pdf` queue (`BullLetterPdfQueue`), after the letter
+  commits. `jobId: letter-<id>` makes enqueueing idempotent; 5 attempts with exponential backoff.
+- `src/worker.ts` is a separate process (Docker `worker` service, `pnpm dev:worker`). Its Redis
+  connection needs `maxRetriesPerRequest: null`. On start it re-queues letters without a PDF, which
+  covers a failed enqueue after commit.
+- `LetterPdfProcessor` is idempotent: skips if a PDF exists; `attachPdf` only sets
+  `pdf_storage_key` where it is NULL, and the loser of a race deletes its file.
+- `LetterPdfHelper` lays out mixed Devanagari/Latin text itself (word wrap on a shared baseline,
+  Noto Sans Devanagari + Noto Sans, `assets/fonts`, OFL). Check layout changes visually
+  (`qlmanage -t` on macOS), not only by tests.
+- `GET /applications/:id/letter/pdf` returns 409 with `Retry-After: 5` until the PDF exists.
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the

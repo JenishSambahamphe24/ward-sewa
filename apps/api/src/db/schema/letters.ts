@@ -27,6 +27,8 @@ export interface LetterSnapshot {
     houseNo: string | null;
   };
   formData: Record<string, string>;
+  // Labels frozen with the values; letters issued before 22 Oct lack this and print raw keys.
+  fields?: { key: string; labelNe: string; labelEn: string; value: string }[];
 }
 
 // A counter row, not a SEQUENCE: sequences skip numbers when a transaction rolls back, and a

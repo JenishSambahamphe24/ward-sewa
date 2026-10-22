@@ -6,6 +6,7 @@ import { pinoHttp } from 'pino-http';
 import type { Db } from './db/client.ts';
 import type { FileStorage } from './lib/file-storage.ts';
 import type { SmsGateway } from './lib/sms.ts';
+import type { LetterPdfQueue } from './modules/letters/letter-pdf.queue.ts';
 import { requireAuth } from './middleware/auth.ts';
 import { errorHandler, notFound } from './middleware/error-handler.ts';
 import { ApplicationAccess } from './modules/applications/application-access.ts';
@@ -50,6 +51,7 @@ export interface AppDeps {
   redis: Redis;
   sms: SmsGateway;
   storage: FileStorage;
+  letterPdfQueue: LetterPdfQueue;
   authSecret: string;
   healthChecks: Record<string, HealthCheck>;
   healthTimeoutMs?: number;
@@ -115,6 +117,10 @@ export function createApp(deps: AppDeps): Express {
         new LettersService({
           letters: new LettersRepository(deps.db, applicationsRepository),
           access,
+          serviceTypes,
+          queue: deps.letterPdfQueue,
+          storage: deps.storage,
+          logger: deps.logger,
         }),
       ),
       authenticated,
