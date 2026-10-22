@@ -14,6 +14,7 @@ const upload = multer({
 export function documentsRouter(
   controller: DocumentsController,
   requireAuth: RequestHandler,
+  uploadLimit: RequestHandler,
 ): Router {
   const citizenOnly = [requireAuth, requireRole('citizen')];
   const applicantOrWardStaff = [
@@ -21,7 +22,13 @@ export function documentsRouter(
     requireRole('citizen', 'ward_secretary', 'ward_chair'),
   ];
   return Router()
-    .post('/applications/:id/documents', citizenOnly, upload.single('file'), controller.upload)
+    .post(
+      '/applications/:id/documents',
+      citizenOnly,
+      uploadLimit,
+      upload.single('file'),
+      controller.upload,
+    )
     .get('/applications/:id/documents', applicantOrWardStaff, controller.list)
     .get('/applications/:id/documents/:documentId/file', applicantOrWardStaff, controller.download);
 }

@@ -11,6 +11,8 @@ const envSchema = z.object({
   SMS_GATEWAY: z.enum(['log']).default('log'),
   UPLOAD_DIR: z.string().min(1).default('./uploads'),
   PUBLIC_BASE_URL: z.url().default('http://localhost:3000'),
+  // Proxy hops in front of the API. 0 = trust no X-Forwarded-For (else clients could spoof IPs).
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
 });
 
 export type Env = z.infer<typeof envSchema>;

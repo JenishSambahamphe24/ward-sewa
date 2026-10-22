@@ -36,6 +36,7 @@ const app = createApp({
   storage: new LocalFileStorage(env.UPLOAD_DIR),
   letterPdfQueue,
   authSecret: env.AUTH_SECRET,
+  trustProxy: env.TRUST_PROXY,
   healthChecks: {
     postgres: () => pool.query('SELECT 1'),
     mongo: () => mongo.db().command({ ping: 1 }),

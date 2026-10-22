@@ -10,6 +10,8 @@ import type { SmsGateway } from './lib/sms.ts';
 import type { LetterPdfQueue } from './modules/letters/letter-pdf.queue.ts';
 import { requireAuth } from './middleware/auth.ts';
 import { errorHandler, notFound } from './middleware/error-handler.ts';
+import { DEFAULT_RATE_LIMITS, rateLimit } from './middleware/rate-limit.ts';
+import type { RateLimits } from './middleware/rate-limit.ts';
 import { ApplicationAccess } from './modules/applications/application-access.ts';
 import { ApplicationsController } from './modules/applications/applications.controller.ts';
 import { ApplicationsRepository } from './modules/applications/applications.repository.ts';
@@ -57,6 +59,8 @@ export interface AppDeps {
   authSecret: string;
   healthChecks: Record<string, HealthCheck>;
   healthTimeoutMs?: number;
+  rateLimits?: RateLimits;
+  trustProxy?: number;
 }
 
 // Opens no connections: tests pass fakes or test databases, server.ts passes real clients.
@@ -72,14 +76,21 @@ export function createApp(deps: AppDeps): Express {
     sms: deps.sms,
   });
   const authenticated = requireAuth(auth);
+  const limits = deps.rateLimits ?? DEFAULT_RATE_LIMITS;
+  const limit = (rule: keyof RateLimits) => rateLimit(deps.redis, deps.logger, limits[rule]);
 
   const app = express();
 
   app.disable('x-powered-by');
+  app.set('trust proxy', deps.trustProxy ?? 0);
   app.use(pinoHttp({ logger: deps.logger }));
   app.use(express.json({ limit: '100kb' }));
 
+  // Health checks come first: orchestrators poll them constantly and must never be throttled.
   app.use(healthRouter(deps.healthChecks, { timeoutMs: deps.healthTimeoutMs }));
+  app.use(limit('global'));
+  app.use('/auth/otp', limit('auth'));
+  app.use('/verify', limit('verify'));
   app.use(authRouter(new AuthController(auth), authenticated));
   app.use(usersRouter(new UsersController(new UsersService(users)), authenticated));
   app.use(
@@ -111,6 +122,7 @@ export function createApp(deps: AppDeps): Express {
         }),
       ),
       authenticated,
+      limit('uploads'),
     ),
   );
   app.use(

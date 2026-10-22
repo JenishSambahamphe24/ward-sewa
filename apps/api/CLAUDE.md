@@ -126,6 +126,17 @@ and enforced by a partial unique index.
   call the owning service's `invalidate()` after a write.
 - `GET /service-types` is cached for 10 minutes per municipality; responses carry `X-Cache: HIT|MISS`.
 
+## Rate limiting
+
+- `rateLimit(redis, logger, rule)` (`middleware/rate-limit.ts`): fixed-window `INCR` + `EXPIRE NX`
+  in one MULTI, standard `RateLimit-*` headers, 429 with `Retry-After`. Fails open (and skips
+  instantly) when Redis isn't ready.
+- Rules live in `DEFAULT_RATE_LIMITS` and are injected into `createApp` (tests pass their own):
+  `global` per IP on everything after health checks, `auth` on `/auth/otp`, `verify` on `/verify`,
+  `uploads` per user on document uploads (place per-user limits after `requireAuth`).
+- `TRUST_PROXY` = number of proxies in front. Keep it 0 without a proxy: trusting
+  `X-Forwarded-For` otherwise lets clients fake their IP and bypass every limit.
+
 ## Letter PDFs (BullMQ)
 
 - Issuing queues a `render` job on the `letter-pdf` queue (`BullLetterPdfQueue`), after the letter
