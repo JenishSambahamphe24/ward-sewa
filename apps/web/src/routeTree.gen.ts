@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
 import { Route as AuthedApplicationsIndexRouteImport } from './routes/_authed/applications/index'
+import { Route as AuthedApplicationsApplicationIdRouteImport } from './routes/_authed/applications/$applicationId'
 import { Route as AuthedApplicationsNewRouteImport } from './routes/_authed/applications/new'
 import { Route as AuthedStaffIndexRouteImport } from './routes/_authed/staff/index'
 
@@ -53,6 +54,12 @@ const AuthedApplicationsIndexRoute = AuthedApplicationsIndexRouteImport.update({
   path: '/applications/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedApplicationsApplicationIdRoute =
+  AuthedApplicationsApplicationIdRouteImport.update({
+    id: '/applications/$applicationId',
+    path: '/applications/$applicationId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 const AuthedApplicationsNewRoute = AuthedApplicationsNewRouteImport.update({
   id: '/applications/new',
   path: '/applications/new',
@@ -69,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/profile': typeof AuthedProfileRoute
+  '/applications/$applicationId': typeof AuthedApplicationsApplicationIdRoute
   '/applications/new': typeof AuthedApplicationsNewRoute
   '/admin/': typeof AuthedAdminIndexRoute
   '/applications/': typeof AuthedApplicationsIndexRoute
@@ -79,6 +87,7 @@ export interface FileRoutesByTo {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/profile': typeof AuthedProfileRoute
+  '/applications/$applicationId': typeof AuthedApplicationsApplicationIdRoute
   '/applications/new': typeof AuthedApplicationsNewRoute
   '/admin': typeof AuthedAdminIndexRoute
   '/applications': typeof AuthedApplicationsIndexRoute
@@ -91,6 +100,7 @@ export interface FileRoutesById {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/_authed/profile': typeof AuthedProfileRoute
+  '/_authed/applications/$applicationId': typeof AuthedApplicationsApplicationIdRoute
   '/_authed/applications/new': typeof AuthedApplicationsNewRoute
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/applications/': typeof AuthedApplicationsIndexRoute
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/profile'
+    | '/applications/$applicationId'
     | '/applications/new'
     | '/admin/'
     | '/applications/'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/profile'
+    | '/applications/$applicationId'
     | '/applications/new'
     | '/admin'
     | '/applications'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/_authed/profile'
+    | '/_authed/applications/$applicationId'
     | '/_authed/applications/new'
     | '/_authed/admin/'
     | '/_authed/applications/'
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedApplicationsIndexRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/applications/$applicationId': {
+      id: '/_authed/applications/$applicationId'
+      path: '/applications/$applicationId'
+      fullPath: '/applications/$applicationId'
+      preLoaderRoute: typeof AuthedApplicationsApplicationIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/applications/new': {
       id: '/_authed/applications/new'
       path: '/applications/new'
@@ -207,6 +227,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthedRouteChildren {
   AuthedProfileRoute: typeof AuthedProfileRoute
+  AuthedApplicationsApplicationIdRoute: typeof AuthedApplicationsApplicationIdRoute
   AuthedApplicationsNewRoute: typeof AuthedApplicationsNewRoute
   AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
   AuthedApplicationsIndexRoute: typeof AuthedApplicationsIndexRoute
@@ -215,6 +236,7 @@ interface AuthedRouteChildren {
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedProfileRoute: AuthedProfileRoute,
+  AuthedApplicationsApplicationIdRoute: AuthedApplicationsApplicationIdRoute,
   AuthedApplicationsNewRoute: AuthedApplicationsNewRoute,
   AuthedAdminIndexRoute: AuthedAdminIndexRoute,
   AuthedApplicationsIndexRoute: AuthedApplicationsIndexRoute,

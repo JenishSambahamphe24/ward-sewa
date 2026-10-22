@@ -124,6 +124,17 @@ describe('BsDateHelper.parse', () => {
   });
 });
 
+describe('BsDateHelper.isValidText', () => {
+  it.each([
+    ['2083-07-04', true],
+    ['२०७५-३-१५', true],
+    ['2083-01-32', false],
+    ['15/03/2075', false],
+  ])('%s → %s', (text, expected) => {
+    expect(BsDateHelper.isValidText(text)).toBe(expected);
+  });
+});
+
 describe('BsDateHelper.format', () => {
   const date = { year: 2083, month: 7, day: 4 };
 

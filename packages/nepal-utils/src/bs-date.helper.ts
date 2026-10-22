@@ -177,6 +177,15 @@ export class BsDateHelper {
     return date;
   }
 
+  static isValidText(text: string): boolean {
+    try {
+      BsDateHelper.parse(text);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   /**
    * iso  → 2083-07-04 / २०८३-०७-०४
    * long → 4 Kartik 2083 / २०८३ कार्तिक ४
