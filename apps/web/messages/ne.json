@@ -1,0 +1,9 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "वडा सेवा",
+  "app_tagline": "वडा कार्यालयको सिफारिस, अनलाइन",
+  "language_switch": "English",
+  "home_heading": "सिफारिसका लागि घरबाटै निवेदन दिनुहोस्",
+  "home_body": "निवेदन दिनुहोस्, कागजात अपलोड गर्नुहोस्, र स्वीकृत सिफारिस पत्र डाउनलोड गर्नुहोस्।",
+  "home_cta": "सुरु गर्नुहोस्"
+}

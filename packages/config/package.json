@@ -11,6 +11,7 @@
   "peerDependencies": {
     "@eslint/js": "catalog:generic",
     "eslint": "catalog:generic",
+    "eslint-plugin-react-hooks": "catalog:generic",
     "globals": "catalog:generic",
     "prettier": "catalog:generic",
     "typescript": "catalog:generic",

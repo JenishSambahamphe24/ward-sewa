@@ -3,3 +3,7 @@ coverage/
 packages/nepal-utils/src/data/divisions.json
 apps/api/src/db/migrations/
 .claude/
+apps/web/src/paraglide/
+apps/web/src/routeTree.gen.ts
+apps/web/project.inlang/
+.turbo/

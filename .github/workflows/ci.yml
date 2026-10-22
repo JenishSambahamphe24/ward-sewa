@@ -48,6 +48,8 @@ jobs:
       - run: pnpm --filter @ward-sewa/nepal-utils coverage
       - run: pnpm --filter @ward-sewa/api test
       - run: pnpm --filter @ward-sewa/api test:integration
+      - run: pnpm --filter @ward-sewa/web test
+      - run: pnpm --filter @ward-sewa/web build
 
   docker:
     runs-on: ubuntu-latest

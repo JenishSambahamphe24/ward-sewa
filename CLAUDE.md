@@ -7,7 +7,7 @@ Ward-office recommendation-letter (sifaris) service. pnpm workspaces, TypeScript
 ```
 apps/                    # deployables
   api/                   # @ward-sewa/api: Express 5 REST API
-  web/                   # planned: React + Vite (Turborepo is added with it)
+  web/                   # @ward-sewa/web: React + Vite citizen portal and staff dashboard
 packages/                # shared libraries
   config/                # @ward-sewa/config: eslint / prettier / tsconfig presets
   nepal-utils/           # @ward-sewa/nepal-utils: BS dates, Nepali numerals, divisions
@@ -17,10 +17,12 @@ docker-compose.yml       # postgres, mongo, redis, migrate, api, worker
 
 ## Working in this repo
 
-- Each workspace has its own `CLAUDE.md` (`apps/api/CLAUDE.md`, `packages/nepal-utils/CLAUDE.md`).
+- Each workspace has its own `CLAUDE.md` (`apps/api/CLAUDE.md`, `apps/web/CLAUDE.md`,
+  `packages/nepal-utils/CLAUDE.md`).
   Read it before working inside that workspace. Its rules are blocking and override general
   assumptions.
-- Run workspace commands with `pnpm --filter <name> <script>`.
+- Run workspace commands with `pnpm --filter <name> <script>`. Root `test`, `typecheck`, `build`
+  and `dev` run through Turborepo (`turbo.json`).
 
 ```sh
 pnpm test && pnpm typecheck && pnpm lint && pnpm format:check   # what CI runs
@@ -60,7 +62,7 @@ Every version lives in `pnpm-workspace.yaml` under `catalogs:`. A `package.json`
 
 - `catalog:generic`: used by both BE and FE (eslint, prettier, typescript, zod, vitest, …)
 - `catalog:be`: backend only (express, pg, ioredis, mongodb, pino, …)
-- `catalog:fe`: frontend only, added with `apps/web`
+- `catalog:fe`: frontend only (React, Vite, TanStack, Tailwind, Paraglide, Testing Library, …)
 
 Never write a literal version in a `package.json`. Add or bump it in the catalog.
 

@@ -1,0 +1,42 @@
+{
+  "name": "@ward-sewa/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "i18n": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
+    "typecheck": "pnpm i18n && tsc",
+    "test": "pnpm i18n && vitest run"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "catalog:fe",
+    "@tanstack/react-router": "catalog:fe",
+    "@ward-sewa/nepal-utils": "workspace:*",
+    "class-variance-authority": "catalog:fe",
+    "clsx": "catalog:fe",
+    "lucide-react": "catalog:fe",
+    "radix-ui": "catalog:fe",
+    "react": "catalog:fe",
+    "react-dom": "catalog:fe",
+    "tailwind-merge": "catalog:fe"
+  },
+  "devDependencies": {
+    "@inlang/paraglide-js": "catalog:fe",
+    "@tailwindcss/vite": "catalog:fe",
+    "@tanstack/router-plugin": "catalog:fe",
+    "@testing-library/react": "catalog:fe",
+    "@testing-library/user-event": "catalog:fe",
+    "@types/react": "catalog:fe",
+    "@types/react-dom": "catalog:fe",
+    "@vitejs/plugin-react": "catalog:fe",
+    "@ward-sewa/config": "workspace:*",
+    "jsdom": "catalog:fe",
+    "tailwindcss": "catalog:fe",
+    "typescript": "catalog:generic",
+    "vite": "catalog:fe",
+    "vitest": "catalog:generic"
+  }
+}

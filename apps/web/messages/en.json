@@ -1,0 +1,9 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Ward Sewa",
+  "app_tagline": "Ward-office recommendation letters, online",
+  "language_switch": "नेपाली",
+  "home_heading": "Apply for your recommendation letter from home",
+  "home_body": "Apply, upload your documents, and download the approved letter.",
+  "home_cta": "Get started"
+}

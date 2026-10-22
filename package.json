@@ -8,20 +8,24 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck",
-    "lint": "eslint .",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:integration": "pnpm --filter @ward-sewa/api test:integration"
+    "lint": "eslint .",
+    "test": "turbo run test",
+    "test:integration": "pnpm --filter @ward-sewa/api test:integration",
+    "typecheck": "turbo run typecheck"
   },
   "prettier": "@ward-sewa/config/prettier",
   "devDependencies": {
     "@eslint/js": "catalog:generic",
     "@ward-sewa/config": "workspace:*",
     "eslint": "catalog:generic",
+    "eslint-plugin-react-hooks": "catalog:generic",
     "globals": "catalog:generic",
     "prettier": "catalog:generic",
+    "turbo": "catalog:generic",
     "typescript": "catalog:generic",
     "typescript-eslint": "catalog:generic"
   }

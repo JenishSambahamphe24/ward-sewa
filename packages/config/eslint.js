@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 const PALETTE =
@@ -15,7 +16,15 @@ const domLookups = [
 ].map((property) => ({ object: 'document', property, message: 'Use useRef instead.' }));
 
 export default defineConfig(
-  { ignores: ['**/node_modules/**', '**/coverage/**', '**/dist/**'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/coverage/**',
+      '**/dist/**',
+      'apps/web/src/paraglide/**',
+      'apps/web/src/routeTree.gen.ts',
+    ],
+  },
   js.configs.recommended,
   tseslint.configs.strict,
   {
@@ -29,6 +38,7 @@ export default defineConfig(
   },
   {
     files: ['apps/web/**/*.{ts,tsx}'],
+    extends: [reactHooks.configs.flat['recommended-latest']],
     languageOptions: { globals: globals.browser },
     rules: {
       'no-restricted-properties': ['error', ...domLookups],

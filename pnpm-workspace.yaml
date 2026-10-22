@@ -12,6 +12,8 @@ catalogs:
     # Exact: bs-calendar.json was extracted from this version.
     nepali-date-converter: 3.4.0
     prettier: ^3.6.2
+    turbo: 2.11.7
+    eslint-plugin-react-hooks: ^7.1.1
     read-excel-file: 9.3.10
     typescript: ~6.0.3
     typescript-eslint: ^8.72.0
@@ -39,3 +41,25 @@ catalogs:
     pino-pretty: ^13.2.0
     qrcode: ^1.5.4
     supertest: ^7.3.1
+
+  fe:
+    '@inlang/paraglide-js': 2.26.0
+    '@tailwindcss/vite': ^4.3.3
+    '@tanstack/react-query': 5.104.1
+    '@tanstack/react-router': 1.170.41
+    '@tanstack/router-plugin': 1.168.42
+    '@testing-library/react': ^16.3.3
+    '@testing-library/user-event': 14.6.7
+    '@types/react': ^19.3.0
+    '@types/react-dom': ^19.3.0
+    '@vitejs/plugin-react': ^5.2.0
+    class-variance-authority: ^0.7.1
+    clsx: ^2.1.1
+    jsdom: 30.1.2
+    lucide-react: 1.53.0
+    radix-ui: 1.7.0
+    react: 19.3.0
+    react-dom: 19.3.0
+    tailwind-merge: ^3.7.0
+    tailwindcss: ^4.3.3
+    vite: 7.3.7
