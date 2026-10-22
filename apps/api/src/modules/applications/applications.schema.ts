@@ -32,6 +32,20 @@ export const listApplicationsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
+export const wardQueueQuerySchema = listApplicationsQuerySchema.extend({
+  status: z
+    .enum(['submitted', 'under_review', 'needs_info', 'approved', 'rejected', 'issued'])
+    .optional(),
+  serviceTypeId: z.coerce.number().int().positive().optional(),
+});
+
+export const transitionSchema = z.object({
+  to: z.enum(['under_review', 'needs_info', 'rejected', 'approved']),
+  version: z.number().int().positive(),
+  note: z.string().trim().min(1).max(500).optional(),
+});
+
 export const applicationIdSchema = z.coerce.number().int().positive();
 
 export type ListApplicationsQuery = z.infer<typeof listApplicationsQuerySchema>;
+export type WardQueueQuery = z.infer<typeof wardQueueQuerySchema>;

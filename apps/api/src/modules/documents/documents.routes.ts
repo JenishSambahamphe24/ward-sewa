@@ -16,8 +16,12 @@ export function documentsRouter(
   requireAuth: RequestHandler,
 ): Router {
   const citizenOnly = [requireAuth, requireRole('citizen')];
+  const applicantOrWardStaff = [
+    requireAuth,
+    requireRole('citizen', 'ward_secretary', 'ward_chair'),
+  ];
   return Router()
     .post('/applications/:id/documents', citizenOnly, upload.single('file'), controller.upload)
-    .get('/applications/:id/documents', citizenOnly, controller.list)
-    .get('/applications/:id/documents/:documentId/file', citizenOnly, controller.download);
+    .get('/applications/:id/documents', applicantOrWardStaff, controller.list)
+    .get('/applications/:id/documents/:documentId/file', applicantOrWardStaff, controller.download);
 }

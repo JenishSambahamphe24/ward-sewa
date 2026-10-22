@@ -3,6 +3,8 @@ import { AppError } from '../../lib/app-error.ts';
 import type { FileStorage } from '../../lib/file-storage.ts';
 import { FileTypeHelper } from '../../lib/file-type.helper.ts';
 import { EDITABLE_STATUSES } from '../applications/applications.repository.ts';
+import type { ApplicationAccess } from '../applications/application-access.ts';
+import { applicationIdSchema } from '../applications/applications.schema.ts';
 import type { ApplicationsService } from '../applications/applications.service.ts';
 import type { ServiceTypesRepository } from '../service-types/service-types.repository.ts';
 import type { User } from '../users/users.repository.ts';
@@ -16,6 +18,7 @@ export interface UploadedFile {
 
 export interface DocumentsServiceDeps {
   applications: ApplicationsService;
+  access: ApplicationAccess;
   serviceTypes: ServiceTypesRepository;
   documents: DocumentsRepository;
   storage: FileStorage;
@@ -69,17 +72,24 @@ export class DocumentsService {
     }
   }
 
-  async list(citizen: User, applicationId: unknown): Promise<Document[]> {
-    const application = await this.#deps.applications.get(citizen, applicationId);
+  async list(user: User, applicationId: unknown): Promise<Document[]> {
+    const application = await this.#deps.access.find(
+      user,
+      applicationIdSchema.parse(applicationId),
+    );
     return this.#deps.documents.list(application.id);
   }
 
+  // Readable by the applicant and their ward's staff; only the applicant uploads.
   async download(
-    citizen: User,
+    user: User,
     applicationId: unknown,
     documentId: unknown,
   ): Promise<{ document: Document; data: Buffer }> {
-    const application = await this.#deps.applications.get(citizen, applicationId);
+    const application = await this.#deps.access.find(
+      user,
+      applicationIdSchema.parse(applicationId),
+    );
     const document = await this.#deps.documents.find(
       application.id,
       documentIdSchema.parse(documentId),
