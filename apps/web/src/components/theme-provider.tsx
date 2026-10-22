@@ -24,7 +24,7 @@ interface ThemeProviderProps {
 }
 
 // Portals (modals) render into a container inside the themed wrapper, so dark mode reaches
-// them without touching <html>.
+// them without touching <html>. `isolate` lets -z-10 layers sit between background and content.
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
@@ -35,7 +35,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   return (
     <ThemeContext value={{ theme, setTheme, portalContainer }}>
-      <div className={cn('min-h-dvh bg-background text-foreground', { dark: theme === 'dark' })}>
+      <div
+        className={cn('isolate min-h-dvh bg-background text-foreground', {
+          dark: theme === 'dark',
+        })}
+      >
         {children}
         <div ref={setPortalContainer} />
       </div>

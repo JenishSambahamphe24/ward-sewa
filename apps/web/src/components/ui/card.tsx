@@ -3,14 +3,17 @@ import { cn } from '@/lib/cn.ts';
 
 interface CardProps extends ComponentProps<'div'> {
   stripe?: 'primary' | 'accent' | 'highlight';
+  glass?: boolean;
 }
 
-export function Card({ className, stripe, ...props }: CardProps) {
+export function Card({ className, stripe, glass = false, ...props }: CardProps) {
   return (
     <div
       className={cn(
         'relative overflow-hidden rounded-xl border border-border bg-surface text-surface-foreground shadow-sm',
         {
+          // Frosted glass: translucent surface, background blur, a light inner edge.
+          'border-surface/60 bg-surface/65 shadow-xl backdrop-blur-xl backdrop-saturate-150': glass,
           'border-t-4 border-t-primary': stripe === 'primary',
           'border-t-4 border-t-accent': stripe === 'accent',
           'border-t-4 border-t-highlight': stripe === 'highlight',

@@ -10,11 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DesignRouteImport } from './routes/design'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
+import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
+import { Route as AuthedApplicationsIndexRouteImport } from './routes/_authed/applications/index'
+import { Route as AuthedApplicationsNewRouteImport } from './routes/_authed/applications/new'
+import { Route as AuthedStaffIndexRouteImport } from './routes/_authed/staff/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignRoute = DesignRouteImport.update({
@@ -22,31 +33,108 @@ const DesignRoute = DesignRouteImport.update({
   path: '/design',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedProfileRoute = AuthedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedApplicationsIndexRoute = AuthedApplicationsIndexRouteImport.update({
+  id: '/applications/',
+  path: '/applications/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedApplicationsNewRoute = AuthedApplicationsNewRouteImport.update({
+  id: '/applications/new',
+  path: '/applications/new',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedStaffIndexRoute = AuthedStaffIndexRouteImport.update({
+  id: '/staff/',
+  path: '/staff/',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof AuthedProfileRoute
+  '/applications/new': typeof AuthedApplicationsNewRoute
+  '/admin/': typeof AuthedAdminIndexRoute
+  '/applications/': typeof AuthedApplicationsIndexRoute
+  '/staff/': typeof AuthedStaffIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof AuthedProfileRoute
+  '/applications/new': typeof AuthedApplicationsNewRoute
+  '/admin': typeof AuthedAdminIndexRoute
+  '/applications': typeof AuthedApplicationsIndexRoute
+  '/staff': typeof AuthedStaffIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
   '/design': typeof DesignRoute
+  '/login': typeof LoginRoute
+  '/_authed/profile': typeof AuthedProfileRoute
+  '/_authed/applications/new': typeof AuthedApplicationsNewRoute
+  '/_authed/admin/': typeof AuthedAdminIndexRoute
+  '/_authed/applications/': typeof AuthedApplicationsIndexRoute
+  '/_authed/staff/': typeof AuthedStaffIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/design'
+  fullPaths:
+    | '/'
+    | '/design'
+    | '/login'
+    | '/profile'
+    | '/applications/new'
+    | '/admin/'
+    | '/applications/'
+    | '/staff/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/design'
-  id: '__root__' | '/' | '/design'
+  to:
+    | '/'
+    | '/design'
+    | '/login'
+    | '/profile'
+    | '/applications/new'
+    | '/admin'
+    | '/applications'
+    | '/staff'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/design'
+    | '/login'
+    | '/_authed/profile'
+    | '/_authed/applications/new'
+    | '/_authed/admin/'
+    | '/_authed/applications/'
+    | '/_authed/staff/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
   DesignRoute: typeof DesignRoute
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/design': {
       id: '/design'
       path: '/design'
@@ -65,12 +160,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesignRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/profile': {
+      id: '/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthedProfileRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/': {
+      id: '/_authed/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthedAdminIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/applications/': {
+      id: '/_authed/applications/'
+      path: '/applications'
+      fullPath: '/applications/'
+      preLoaderRoute: typeof AuthedApplicationsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/applications/new': {
+      id: '/_authed/applications/new'
+      path: '/applications/new'
+      fullPath: '/applications/new'
+      preLoaderRoute: typeof AuthedApplicationsNewRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/staff/': {
+      id: '/_authed/staff/'
+      path: '/staff'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof AuthedStaffIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedProfileRoute: typeof AuthedProfileRoute
+  AuthedApplicationsNewRoute: typeof AuthedApplicationsNewRoute
+  AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
+  AuthedApplicationsIndexRoute: typeof AuthedApplicationsIndexRoute
+  AuthedStaffIndexRoute: typeof AuthedStaffIndexRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedProfileRoute: AuthedProfileRoute,
+  AuthedApplicationsNewRoute: AuthedApplicationsNewRoute,
+  AuthedAdminIndexRoute: AuthedAdminIndexRoute,
+  AuthedApplicationsIndexRoute: AuthedApplicationsIndexRoute,
+  AuthedStaffIndexRoute: AuthedStaffIndexRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
   DesignRoute: DesignRoute,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

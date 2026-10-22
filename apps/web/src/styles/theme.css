@@ -78,6 +78,16 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: 'Noto Sans', 'Noto Sans Devanagari', system-ui, sans-serif;
+  --animate-drift: drift 18s ease-in-out infinite alternate;
+
+  @keyframes drift {
+    from {
+      transform: translate(0, 0) scale(1);
+    }
+    to {
+      transform: translate(2rem, -1.5rem) scale(1.08);
+    }
+  }
 }
 
 @layer base {

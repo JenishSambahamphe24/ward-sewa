@@ -86,5 +86,6 @@ boot with a readiness check on every push and pull request.
 - [ ] BullMQ SMS job (replacing the development log gateway)
 - [x] MongoDB audit trail via a transactional outbox, and SMS notification logs with a TTL index
 - [x] Web app scaffold: React, TanStack Router + Query, Tailwind v4 theme tokens, Nepali/English
+- [x] Web login: OTP in two steps, session, role-based navigation and route guards
 - [ ] React citizen portal and staff dashboard
 - [ ] OpenAPI documentation

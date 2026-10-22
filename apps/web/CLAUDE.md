@@ -13,6 +13,14 @@ pnpm --filter @ward-sewa/web build
   the Vite plugin and committed; never edit it.
 - **Data:** TanStack Query for every request; no `fetch` in components. API calls go through
   `src/lib/api.ts`.
+- **Auth:** `ApiClient` (`src/lib/api-client.ts`) is the only place that calls `fetch`: it adds the
+  Bearer token, throws `ApiError` (code, status, `retryAfterSeconds`) and clears the session on 401.
+  `meQuery` is the current user. Protected pages live under `src/routes/_authed/`; the layout's
+  `beforeLoad` redirects to `/login?redirect=…`, and each page calls
+  `RouteGuardHelper.requireRoles` in its own `beforeLoad`. Post-login redirects go through
+  `RedirectHelper.afterLogin` (same-site paths only).
+- **Errors:** show the user our own message for an `ApiError` code (see `AuthErrorHelper`), never
+  the server's English text.
 - **i18n:** Paraglide JS. Every user-facing string is a message in `messages/ne.json` and
   `messages/en.json` (Nepali is the base locale); use `m.key()`. `src/paraglide/` is generated
   (`pnpm i18n`) and git-ignored.
@@ -20,4 +28,5 @@ pnpm --filter @ward-sewa/web build
   semantic tokens from `src/styles/theme.css`. Variants use `cva`, class names `cn()`.
 - **Imports:** `@/` points to `src/`; keep explicit `.ts`/`.tsx` extensions like the rest of the
   repo.
+- Tests: Vitest + Testing Library; `src/test/setup.ts` runs `cleanup()` (globals are off).
 - Vite is pinned to 7.x because the repo's Vitest 3 doesn't support Vite 8.

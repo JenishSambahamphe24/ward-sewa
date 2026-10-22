@@ -1,25 +1,21 @@
-import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
-import { LanguageSwitch } from '@/components/language-switch.tsx';
+import type { QueryClient } from '@tanstack/react-query';
+import { Link, Outlet, createRootRouteWithContext } from '@tanstack/react-router';
+import { AppHeader } from '@/components/app-header.tsx';
+import { BrandBackdrop } from '@/components/brand-backdrop.tsx';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
-import { ThemeSwitch } from '@/components/theme-switch.tsx';
 import { m } from '@/paraglide/messages.js';
 
-export const Route = createRootRoute({ component: RootLayout });
+export interface RouterContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({ component: RootLayout });
 
 function RootLayout() {
   return (
     <ThemeProvider>
-      <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
-          <Link to="/" className="text-lg font-semibold text-primary">
-            {m.app_name()}
-          </Link>
-          <div className="flex items-center gap-3">
-            <ThemeSwitch />
-            <LanguageSwitch />
-          </div>
-        </div>
-      </header>
+      <BrandBackdrop />
+      <AppHeader />
       <main className="mx-auto max-w-5xl px-4 py-8">
         <Outlet />
       </main>
