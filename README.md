@@ -77,9 +77,9 @@ boot with a readiness check on every push and pull request.
 - [x] Service types per municipality; citizens create and edit draft applications with optimistic locking
 - [x] Document uploads (type checked by content, 5 MB limit) and submission with status history
 - [x] Staff review workflow: ward-scoped queue, role-checked transitions, notes, status history
-- [ ] Issuing letters: official letter numbers, PDF with QR verification
+- [x] Issuing letters: gap-free numbers per ward and fiscal year, frozen snapshot, public verification
+- [ ] Letter PDF with QR code, rendered by a BullMQ worker
 - [ ] Redis: rate limiting, caching, idempotency keys, BullMQ jobs for PDFs and SMS
 - [ ] MongoDB: audit trail and notification log
-- [ ] Letter PDF in Nepali with QR code verification
 - [ ] React citizen portal and staff dashboard
 - [ ] OpenAPI documentation

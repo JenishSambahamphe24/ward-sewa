@@ -1,7 +1,6 @@
-import { randomBytes } from 'node:crypto';
 import { and, asc, count, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
-import type { Db } from '../../db/client.ts';
+import type { Db, DbExecutor } from '../../db/client.ts';
 import {
   applicationStatusHistory,
   applications,
@@ -9,6 +8,7 @@ import {
   users,
   wards,
 } from '../../db/schema/index.ts';
+import { CodeHelper } from '../../lib/code.helper.ts';
 import type { ListApplicationsQuery, WardQueueQuery } from './applications.schema.ts';
 
 export type ApplicationStatus = (typeof applications.$inferSelect)['status'];
@@ -52,10 +52,8 @@ export interface ApplicationChanges {
   formData?: Record<string, string>;
 }
 
-// Crockford base32 (no I, L, O, U): easy to read out over the phone. 256 % 32 = 0, so no bias.
-const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const trackingNo = () => {
-  const chars = [...randomBytes(8)].map((byte) => ALPHABET[byte % 32]).join('');
+  const chars = CodeHelper.random(8);
   return `WS-${chars.slice(0, 4)}-${chars.slice(4)}`;
 };
 
@@ -82,8 +80,9 @@ export class ApplicationsRepository {
 
   // Status and its history row change together or not at all. Matching on `version` also
   // proves the status is still `from`, since every status change bumps the version.
-  async transition(change: StatusChange): Promise<boolean> {
-    return this.#db.transaction(async (tx) => {
+  // Pass `executor` to join a caller's transaction (issuing a letter does more in the same one).
+  async transition(change: StatusChange, executor?: DbExecutor): Promise<boolean> {
+    const run = async (tx: DbExecutor) => {
       const updated = await tx
         .update(applications)
         .set({
@@ -109,7 +108,8 @@ export class ApplicationsRepository {
         note: change.note,
       });
       return true;
-    });
+    };
+    return executor ? run(executor) : this.#db.transaction(run);
   }
 
   history(applicationId: number) {

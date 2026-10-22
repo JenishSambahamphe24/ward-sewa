@@ -106,6 +106,18 @@ and enforced by a partial unique index.
   required note → 400, stale version → 409. Only the chair approves; the municipality admin can't
   review at all (separation of duties).
 
+## Issuing letters
+
+- `POST /staff/applications/:id/issue { version }` (secretary or chair of the ward, application
+  `approved`). `LettersRepository.issue` runs status change + history + number + letter in one
+  transaction; `ApplicationsRepository.transition(change, tx)` joins it.
+- Letter numbers come from the `letter_counters` row for (ward, fiscal year), incremented with an
+  upsert. Never use a SEQUENCE for them: sequences skip numbers on rollback, the register must not.
+- `issued_letters.snapshot` freezes applicant name, service type, address (with names) and form
+  data. Read letters from the snapshot, never by re-joining live tables.
+- Issue date and fiscal year come from `BsDateHelper.today()` (Nepal time).
+- `GET /verify/:code` is public and returns only what a verifier needs (no phone, no form data).
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the
