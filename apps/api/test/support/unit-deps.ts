@@ -1,4 +1,5 @@
 import type { Redis } from 'ioredis';
+import type { Db as MongoDb } from 'mongodb';
 import { pino } from 'pino';
 import type { AppDeps } from '../../src/app.ts';
 import type { Db } from '../../src/db/client.ts';
@@ -11,6 +12,7 @@ export class UnitDeps {
       logger: pino({ level: 'silent' }),
       db: {} as Db,
       redis: {} as Redis,
+      mongo: { collection: () => ({}) } as unknown as MongoDb,
       sms: { send: () => Promise.resolve() },
       storage: {} as FileStorage,
       letterPdfQueue: { enqueue: () => Promise.resolve() },

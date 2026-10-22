@@ -57,6 +57,7 @@ export class LettersService {
       verificationCode: CodeHelper.random(10),
       snapshot: this.#snapshot(application, serviceType?.formFields ?? []),
       issuedBy: staff.id,
+      issuedByRole: staff.role,
     });
     if (!letter) {
       throw new AppError(

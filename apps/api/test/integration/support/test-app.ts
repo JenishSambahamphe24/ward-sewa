@@ -11,6 +11,7 @@ import type { Db } from '../../../src/db/client.ts';
 import { users } from '../../../src/db/schema/index.ts';
 import { LocalFileStorage } from '../../../src/lib/file-storage.ts';
 import { SessionStore } from '../../../src/modules/auth/session.store.ts';
+import { TestMongo } from './test-mongo.ts';
 
 // Ordinary tests must never trip a limit; rate-limit.test.ts sets its own small ones.
 const UNLIMITED = Object.fromEntries(
@@ -23,6 +24,7 @@ export class TestApp {
       logger: pino({ level: 'silent' }),
       db,
       redis,
+      mongo: TestMongo.db(),
       sms: { send: () => Promise.resolve() },
       storage: new LocalFileStorage(mkdtempSync(join(tmpdir(), 'ward-sewa-uploads-'))),
       letterPdfQueue: { enqueue: () => Promise.resolve() },

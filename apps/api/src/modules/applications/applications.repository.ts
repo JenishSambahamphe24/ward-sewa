@@ -9,6 +9,7 @@ import {
   wards,
 } from '../../db/schema/index.ts';
 import { CodeHelper } from '../../lib/code.helper.ts';
+import { AuditOutboxRepository } from '../audit/audit-outbox.repository.ts';
 import type { ListApplicationsQuery, WardQueueQuery } from './applications.schema.ts';
 
 export type ApplicationStatus = (typeof applications.$inferSelect)['status'];
@@ -41,8 +42,9 @@ export interface StatusChange {
   applicationId: number;
   version: number;
   from: ApplicationStatus;
-  to: ApplicationStatus;
+  to: Exclude<ApplicationStatus, 'draft'>;
   actorId: number;
+  actorRole: string;
   note?: string;
 }
 
@@ -74,6 +76,11 @@ export class ApplicationsRepository {
       await tx
         .insert(applicationStatusHistory)
         .values({ applicationId: row.id, toStatus: 'draft', actorId: values.citizenId });
+      await AuditOutboxRepository.add(tx, {
+        type: 'application.created',
+        actor: { userId: values.citizenId, role: 'citizen' },
+        target: { applicationId: row.id },
+      });
       return row.id;
     });
   }
@@ -106,6 +113,13 @@ export class ApplicationsRepository {
         toStatus: change.to,
         actorId: change.actorId,
         note: change.note,
+      });
+      await AuditOutboxRepository.add(tx, {
+        type: `application.${change.to}` as const,
+        actor: { userId: change.actorId, role: change.actorRole },
+        target: { applicationId: change.applicationId },
+        changes: { status: { from: change.from, to: change.to } },
+        ...(change.note ? { note: change.note } : {}),
       });
       return true;
     };

@@ -142,6 +142,7 @@ export class ApplicationsService {
       from: current.status,
       to: 'submitted',
       actorId: citizen.id,
+      actorRole: citizen.role,
     });
     if (!submitted) {
       throw new AppError(

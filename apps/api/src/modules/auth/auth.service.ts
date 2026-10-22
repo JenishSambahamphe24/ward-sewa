@@ -23,7 +23,7 @@ export class AuthService {
   async requestOtp(input: unknown): Promise<{ expiresInSeconds: number }> {
     const { phone } = requestOtpSchema.parse(input);
     const code = await this.#deps.otp.issue(phone);
-    await this.#deps.sms.send(phone, `Ward Sewa login code: ${code}. Valid for 5 minutes.`);
+    await this.#deps.sms.send(phone, `Ward Sewa login code: ${code}. Valid for 5 minutes.`, 'otp');
     return { expiresInSeconds: OTP_TTL_SECONDS };
   }
 

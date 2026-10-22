@@ -3,6 +3,7 @@ import type { Db } from '../../db/client.ts';
 import { issuedLetters, letterCounters } from '../../db/schema/index.ts';
 import type { LetterSnapshot } from '../../db/schema/index.ts';
 import type { ApplicationsRepository } from '../applications/applications.repository.ts';
+import { AuditOutboxRepository } from '../audit/audit-outbox.repository.ts';
 
 export type IssuedLetter = typeof issuedLetters.$inferSelect;
 
@@ -15,6 +16,7 @@ export interface IssueLetter {
   verificationCode: string;
   snapshot: LetterSnapshot;
   issuedBy: number;
+  issuedByRole: string;
 }
 
 export class LettersRepository {
@@ -37,6 +39,7 @@ export class LettersRepository {
           from: 'approved',
           to: 'issued',
           actorId: input.issuedBy,
+          actorRole: input.issuedByRole,
         },
         tx,
       );
@@ -67,6 +70,12 @@ export class LettersRepository {
         })
         .returning();
       if (!letter) throw new Error('INSERT ... RETURNING returned no row');
+      await AuditOutboxRepository.add(tx, {
+        type: 'letter.issued',
+        actor: { userId: input.issuedBy, role: input.issuedByRole },
+        target: { applicationId: input.applicationId, letterId: letter.id },
+        changes: { letterNo: { from: null, to: letter.letterNo } },
+      });
       return letter;
     });
   }

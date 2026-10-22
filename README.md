@@ -83,6 +83,6 @@ boot with a readiness check on every push and pull request.
 - [x] Redis rate limiting: per IP and per user, RateLimit headers, safe behind proxies
 - [x] Idempotency keys: a retried POST /applications creates exactly one application
 - [ ] BullMQ SMS job (replacing the development log gateway)
-- [ ] MongoDB: audit trail and notification log
+- [x] MongoDB audit trail via a transactional outbox, and SMS notification logs with a TTL index
 - [ ] React citizen portal and staff dashboard
 - [ ] OpenAPI documentation

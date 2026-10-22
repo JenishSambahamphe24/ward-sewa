@@ -1,4 +1,6 @@
+import type { TransactionRunner } from '../../db/transactions.ts';
 import { AppError } from '../../lib/app-error.ts';
+import { AuditOutboxRepository } from '../audit/audit-outbox.repository.ts';
 import type { WardsRepository } from '../divisions/wards.repository.ts';
 import type { User, UsersRepository } from '../users/users.repository.ts';
 import type { StaffMember, StaffRepository } from './staff.repository.ts';
@@ -13,6 +15,7 @@ export interface StaffServiceDeps {
   staff: StaffRepository;
   users: UsersRepository;
   wards: WardsRepository;
+  transactions: TransactionRunner;
 }
 
 const chairTaken = (wardNo: number) =>
@@ -42,12 +45,26 @@ export class StaffService {
       throw new AppError(409, 'CONFLICT', 'This phone number already belongs to staff or an admin');
     }
 
-    if (existing) {
-      await this.#deps.staff.update(existing.id, { name, role, wardId });
-      return this.#mustFind(localLevelCode, existing.id);
-    }
-    const created = await this.#deps.users.create({ phone, name, role, wardId });
-    return this.#mustFind(localLevelCode, created.id);
+    const userId = await this.#deps.transactions.run(async (tx) => {
+      let id: number;
+      if (existing) {
+        await this.#deps.staff.update(existing.id, { name, role, wardId }, tx);
+        id = existing.id;
+      } else {
+        id = (await this.#deps.users.create({ phone, name, role, wardId }, tx)).id;
+      }
+      await AuditOutboxRepository.add(tx, {
+        type: 'staff.assigned',
+        actor: { userId: admin.id, role: admin.role },
+        target: { userId: id },
+        changes: {
+          role: { from: existing?.role ?? null, to: role },
+          wardNo: { from: null, to: wardNo },
+        },
+      });
+      return id;
+    });
+    return this.#mustFind(localLevelCode, userId);
   }
 
   async update(admin: User, id: unknown, input: unknown): Promise<StaffMember> {
@@ -68,7 +85,19 @@ export class StaffService {
       throw chairTaken(wardNo);
     }
 
-    await this.#deps.staff.update(member.id, { role, wardId, isActive });
+    await this.#deps.transactions.run(async (tx) => {
+      await this.#deps.staff.update(member.id, { role, wardId, isActive }, tx);
+      await AuditOutboxRepository.add(tx, {
+        type: 'staff.updated',
+        actor: { userId: admin.id, role: admin.role },
+        target: { userId: member.id },
+        changes: {
+          role: { from: member.role, to: role },
+          wardNo: { from: member.ward.wardNo, to: wardNo },
+          isActive: { from: member.isActive, to: isActive },
+        },
+      });
+    });
     return this.#mustFind(localLevelCode, member.id);
   }
 

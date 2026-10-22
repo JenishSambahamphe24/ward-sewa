@@ -7,6 +7,11 @@ import { createDb } from './db/client.ts';
 import { EnvHelper } from './lib/env.helper.ts';
 import { LocalFileStorage } from './lib/file-storage.ts';
 import { LogSmsGateway } from './lib/sms.ts';
+import { AuditStore } from './modules/audit/audit.store.ts';
+import {
+  NotificationLogStore,
+  RecordingSmsGateway,
+} from './modules/audit/notification-log.store.ts';
 import { BullLetterPdfQueue } from './modules/letters/letter-pdf.queue.ts';
 
 const env = EnvHelper.load();
@@ -26,13 +31,21 @@ try {
   logger.warn({ err: (err as Error).message }, 'mongo unavailable at startup; will keep retrying');
 }
 
+const notificationLogs = new NotificationLogStore(mongo.db());
+await Promise.all([
+  new AuditStore(mongo.db()).ensureIndexes(),
+  notificationLogs.ensureIndexes(),
+]).catch((err: Error) =>
+  logger.warn({ err: err.message }, 'could not ensure mongo indexes; will retry next start'),
+);
 const letterPdfQueue = new BullLetterPdfQueue(redis);
 
 const app = createApp({
   logger,
   db: createDb(pool),
   redis,
-  sms: new LogSmsGateway(logger),
+  mongo: mongo.db(),
+  sms: new RecordingSmsGateway(new LogSmsGateway(logger), notificationLogs, logger),
   storage: new LocalFileStorage(env.UPLOAD_DIR),
   letterPdfQueue,
   authSecret: env.AUTH_SECRET,

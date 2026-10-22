@@ -82,6 +82,7 @@ services:
     command: ['node', 'apps/api/src/worker.ts']
     environment:
       DATABASE_URL: postgres://ward_sewa:ward_sewa_dev@postgres:5432/ward_sewa
+      MONGO_URL: mongodb://mongo:27017/ward_sewa
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /data/uploads
       PUBLIC_BASE_URL: http://localhost:3000
@@ -89,6 +90,7 @@ services:
     depends_on:
       migrate: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
+      mongo: { condition: service_healthy }
 
 volumes:
   uploads-data:

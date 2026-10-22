@@ -83,6 +83,7 @@ export class ReviewService {
       from: application.status,
       to,
       actorId: staff.id,
+      actorRole: staff.role,
       note,
     });
     if (!moved) {

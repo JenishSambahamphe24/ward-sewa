@@ -31,6 +31,7 @@ export class EnvHelper {
       envSchema.pick({
         LOG_LEVEL: true,
         DATABASE_URL: true,
+        MONGO_URL: true,
         REDIS_URL: true,
         UPLOAD_DIR: true,
         PUBLIC_BASE_URL: true,

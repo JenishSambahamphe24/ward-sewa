@@ -148,6 +148,18 @@ and enforced by a partial unique index.
   (a duplicate draft is harmless; anything involving money should refuse instead).
 - Add it to any new endpoint that creates something a client might retry.
 
+## Audit log (MongoDB, via a transactional outbox)
+
+- Every change worth auditing adds an event with `AuditOutboxRepository.add(tx, event)` **inside the
+  transaction that makes the change** (status transitions, letter issue, staff assign/update). For
+  multi-repository writes, use `TransactionRunner.run(tx => …)` and pass `tx` down.
+- The worker's `AuditRelay` drains `audit_outbox` into MongoDB `audit_events` (`FOR UPDATE SKIP
+LOCKED`, outbox id as `_id`, duplicate-key errors ignored), then deletes the rows. MongoDB down
+  only delays events; it never blocks or loses them.
+- `GET /applications/:id/audit` (applicant or ward staff) reads the `by_application` index.
+- `notification_logs` records SMS attempts (masked number, never the message), expires after 90
+  days via a TTL index, and is best effort: a MongoDB failure must not stop an SMS.
+
 ## Letter PDFs (BullMQ)
 
 - Issuing queues a `render` job on the `letter-pdf` queue (`BullLetterPdfQueue`), after the letter

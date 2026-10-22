@@ -1,6 +1,6 @@
 import { and, eq, inArray, ne } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
-import type { Db } from '../../db/client.ts';
+import type { Db, DbExecutor } from '../../db/client.ts';
 import { users, wards } from '../../db/schema/index.ts';
 import type { ListStaffQuery, StaffRole } from './staff.schema.ts';
 
@@ -86,7 +86,7 @@ export class StaffRepository {
     return Boolean(chair);
   }
 
-  async update(id: number, changes: StaffChanges): Promise<void> {
-    await this.#db.update(users).set(changes).where(eq(users.id, id));
+  async update(id: number, changes: StaffChanges, executor: DbExecutor = this.#db): Promise<void> {
+    await executor.update(users).set(changes).where(eq(users.id, id));
   }
 }

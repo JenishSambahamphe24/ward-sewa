@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import type { Db } from '../../db/client.ts';
+import type { Db, DbExecutor } from '../../db/client.ts';
 import { users } from '../../db/schema/index.ts';
 
 export type User = typeof users.$inferSelect;
@@ -33,8 +33,8 @@ export class UsersRepository {
     return user;
   }
 
-  async create(values: NewUser): Promise<User> {
-    const [user] = await this.#db.insert(users).values(values).returning();
+  async create(values: NewUser, executor: DbExecutor = this.#db): Promise<User> {
+    const [user] = await executor.insert(users).values(values).returning();
     if (!user) throw new Error('INSERT ... RETURNING returned no row');
     return user;
   }

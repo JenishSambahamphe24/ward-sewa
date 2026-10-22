@@ -1,9 +1,11 @@
 import express from 'express';
 import type { Express } from 'express';
 import type { Redis } from 'ioredis';
+import type { Db as MongoDb } from 'mongodb';
 import type { Logger } from 'pino';
 import { pinoHttp } from 'pino-http';
 import type { Db } from './db/client.ts';
+import { TransactionRunner } from './db/transactions.ts';
 import { RedisCache } from './lib/cache.ts';
 import type { FileStorage } from './lib/file-storage.ts';
 import type { SmsGateway } from './lib/sms.ts';
@@ -18,6 +20,10 @@ import { ApplicationsController } from './modules/applications/applications.cont
 import { ApplicationsRepository } from './modules/applications/applications.repository.ts';
 import { applicationsRouter } from './modules/applications/applications.routes.ts';
 import { ApplicationsService } from './modules/applications/applications.service.ts';
+import { AuditController } from './modules/audit/audit.controller.ts';
+import { auditRouter } from './modules/audit/audit.routes.ts';
+import { AuditService } from './modules/audit/audit.service.ts';
+import { AuditStore } from './modules/audit/audit.store.ts';
 import { AuthController } from './modules/auth/auth.controller.ts';
 import { authRouter } from './modules/auth/auth.routes.ts';
 import { AuthService } from './modules/auth/auth.service.ts';
@@ -54,6 +60,7 @@ export interface AppDeps {
   logger: Logger;
   db: Db;
   redis: Redis;
+  mongo: MongoDb;
   sms: SmsGateway;
   storage: FileStorage;
   letterPdfQueue: LetterPdfQueue;
@@ -139,6 +146,12 @@ export function createApp(deps: AppDeps): Express {
     ),
   );
   app.use(
+    auditRouter(
+      new AuditController(new AuditService({ access, store: new AuditStore(deps.mongo) })),
+      authenticated,
+    ),
+  );
+  app.use(
     lettersRouter(
       new LettersController(
         new LettersService({
@@ -155,7 +168,14 @@ export function createApp(deps: AppDeps): Express {
   );
   app.use(
     staffRouter(
-      new StaffController(new StaffService({ staff: new StaffRepository(deps.db), users, wards })),
+      new StaffController(
+        new StaffService({
+          staff: new StaffRepository(deps.db),
+          users,
+          wards,
+          transactions: new TransactionRunner(deps.db),
+        }),
+      ),
       authenticated,
     ),
   );
