@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { Application, ApplicationsPage, IssuedLetter } from '@/features/applications/types.ts';
 import { ApiClient } from '@/lib/api-client.ts';
-import type { QueueFilters, ReviewAction } from './types.ts';
+import type { AuditEvent, QueueFilters, ReviewAction } from './types.ts';
 
 export const QUEUE_KEY = ['staff-queue'] as const;
 export const QUEUE_PAGE_SIZE = 20;
@@ -24,6 +24,14 @@ export const staffApplicationQuery = (id: number) =>
     queryKey: ['staff-applications', id],
     queryFn: async () =>
       (await ApiClient.get<{ application: Application }>(`/staff/applications/${id}`)).application,
+  });
+
+// Events reach MongoDB through the worker, a few seconds after the change commits.
+export const auditQuery = (id: number) =>
+  queryOptions({
+    queryKey: ['applications', id, 'audit'],
+    queryFn: async () =>
+      (await ApiClient.get<{ events: AuditEvent[] }>(`/applications/${id}/audit`)).events,
   });
 
 export class ReviewApi {

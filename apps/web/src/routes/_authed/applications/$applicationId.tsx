@@ -10,12 +10,13 @@ import { SubmitPanel } from '@/features/applications/submit-panel.tsx';
 import { Timeline } from '@/features/applications/timeline.tsx';
 import { EDITABLE_STATUSES } from '@/features/applications/types.ts';
 import { LocaleHelper } from '@/lib/locale.helper.ts';
+import { RouteParamHelper } from '@/lib/route-param.helper.ts';
 import { MoneyHelper } from '@/lib/money.helper.ts';
 import { m } from '@/paraglide/messages.js';
 
 export const Route = createFileRoute('/_authed/applications/$applicationId')({
   params: {
-    parse: (params) => ({ applicationId: Number(params.applicationId) }),
+    parse: (params) => ({ applicationId: RouteParamHelper.id(params.applicationId) }),
     stringify: (params) => ({ applicationId: String(params.applicationId) }),
   },
   beforeLoad: ({ context }) => RouteGuardHelper.requireRoles(context.user, ['citizen']),

@@ -10,15 +10,17 @@ import { serviceTypesQuery } from '@/features/applications/queries.ts';
 import { Timeline } from '@/features/applications/timeline.tsx';
 import { RouteGuardHelper } from '@/features/auth/route-guard.helper.ts';
 import { STAFF_ROLES } from '@/features/auth/session.ts';
+import { AuditTrail } from '@/features/review/audit-trail.tsx';
 import { staffApplicationQuery } from '@/features/review/queries.ts';
 import { ReviewActions } from '@/features/review/review-actions.tsx';
 import { LocaleHelper } from '@/lib/locale.helper.ts';
+import { RouteParamHelper } from '@/lib/route-param.helper.ts';
 import { MoneyHelper } from '@/lib/money.helper.ts';
 import { m } from '@/paraglide/messages.js';
 
 export const Route = createFileRoute('/_authed/staff/applications/$applicationId')({
   params: {
-    parse: (params) => ({ applicationId: Number(params.applicationId) }),
+    parse: (params) => ({ applicationId: RouteParamHelper.id(params.applicationId) }),
     stringify: (params) => ({ applicationId: String(params.applicationId) }),
   },
   beforeLoad: ({ context }) => RouteGuardHelper.requireRoles(context.user, STAFF_ROLES),
@@ -100,7 +102,10 @@ function ReviewPage() {
             />
           )}
         </div>
-        <Timeline applicationId={application.id} />
+        <div className="flex flex-col gap-6">
+          <Timeline applicationId={application.id} />
+          <AuditTrail applicationId={application.id} />
+        </div>
       </div>
     </div>
   );

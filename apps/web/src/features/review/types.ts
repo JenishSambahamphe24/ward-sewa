@@ -8,3 +8,12 @@ export interface QueueFilters {
 }
 
 export type ReviewAction = 'under_review' | 'needs_info' | 'rejected' | 'approved' | 'issue';
+
+export interface AuditEvent {
+  id: number;
+  type: string;
+  actor: { userId: number; role: string };
+  changes?: Record<string, { from: unknown; to: unknown }>;
+  note?: string;
+  at: string;
+}

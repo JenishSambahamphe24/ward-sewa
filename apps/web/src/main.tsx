@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ErrorPage } from '@/components/error-page.tsx';
+import { NotFoundPage } from '@/components/not-found-page.tsx';
 import { ApiClient } from '@/lib/api-client.ts';
 import { getLocale } from '@/paraglide/runtime.js';
 import { routeTree } from './routeTree.gen.ts';
@@ -10,7 +12,13 @@ import './styles/theme.css';
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
 });
-const router = createRouter({ routeTree, context: { queryClient }, defaultPreload: 'intent' });
+const router = createRouter({
+  routeTree,
+  context: { queryClient },
+  defaultPreload: 'intent',
+  defaultNotFoundComponent: NotFoundPage,
+  defaultErrorComponent: ErrorPage,
+});
 
 ApiClient.onUnauthorized(() => {
   queryClient.clear();
