@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { Application, IssuedLetter } from '@/features/applications/types.ts';
+import type { Application, ApplicationsPage, IssuedLetter } from '@/features/applications/types.ts';
 import { ApiClient } from '@/lib/api-client.ts';
-import type { QueueFilters, QueuePage, ReviewAction } from './types.ts';
+import type { QueueFilters, ReviewAction } from './types.ts';
 
 export const QUEUE_KEY = ['staff-queue'] as const;
 export const QUEUE_PAGE_SIZE = 20;
@@ -15,7 +15,7 @@ export const queueQuery = (filters: QueueFilters) =>
         limit: String(QUEUE_PAGE_SIZE),
       });
       if (filters.status) params.set('status', filters.status);
-      return ApiClient.get<QueuePage>(`/staff/applications?${params}`);
+      return ApiClient.get<ApplicationsPage>(`/staff/applications?${params}`);
     },
   });
 

@@ -1,8 +1,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { Pager } from '@/components/pager.tsx';
 import { Alert } from '@/components/ui/alert.tsx';
-import { Button } from '@/components/ui/button.tsx';
 import { Card, CardContent } from '@/components/ui/card.tsx';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { RouteGuardHelper } from '@/features/auth/route-guard.helper.ts';
@@ -11,7 +11,6 @@ import { QUEUE_PAGE_SIZE, queueQuery } from '@/features/review/queries.ts';
 import { QueueList } from '@/features/review/queue-list.tsx';
 import type { QueueStatus } from '@/features/review/types.ts';
 import { ApiErrorHelper } from '@/lib/api-error.helper.ts';
-import { LocaleHelper } from '@/lib/locale.helper.ts';
 import { m } from '@/paraglide/messages.js';
 
 const ALL = 'all';
@@ -41,7 +40,6 @@ function QueuePage() {
     ...queueQuery({ status, page }),
     placeholderData: keepPreviousData,
   });
-  const pages = data ? Math.max(1, Math.ceil(data.total / QUEUE_PAGE_SIZE)) : 1;
 
   return (
     <div className="flex flex-col gap-6">
@@ -74,32 +72,13 @@ function QueuePage() {
           {isPending && <p className="py-8 text-center text-muted-foreground">{m.loading()}</p>}
           {data && <QueueList items={data.items} />}
 
-          {data && pages > 1 && (
-            <div className="flex items-center justify-between gap-2 border-t border-border pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                {m.action_previous()}
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                {m.queue_page({
-                  page: LocaleHelper.digits(page),
-                  pages: LocaleHelper.digits(pages),
-                  total: LocaleHelper.digits(data.total),
-                })}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= pages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                {m.action_next()}
-              </Button>
-            </div>
+          {data && (
+            <Pager
+              page={page}
+              pageSize={QUEUE_PAGE_SIZE}
+              total={data.total}
+              onPageChange={setPage}
+            />
           )}
         </CardContent>
       </Card>

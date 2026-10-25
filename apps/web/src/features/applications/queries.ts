@@ -3,6 +3,7 @@ import { ApiClient } from '@/lib/api-client.ts';
 import type {
   Application,
   ApplicationDocument,
+  ApplicationsPage,
   HistoryEntry,
   IssuedLetter,
   NewApplication,
@@ -19,6 +20,17 @@ export const serviceTypesQuery = (localLevelCode: string) =>
         )
       ).serviceTypes,
     staleTime: 10 * 60_000,
+  });
+
+export const MY_APPLICATIONS_PAGE_SIZE = 10;
+
+export const myApplicationsQuery = (page: number) =>
+  queryOptions({
+    queryKey: ['applications', 'mine', page],
+    queryFn: () =>
+      ApiClient.get<ApplicationsPage>(
+        `/applications?page=${page}&limit=${MY_APPLICATIONS_PAGE_SIZE}`,
+      ),
   });
 
 export const applicationQuery = (id: number) =>

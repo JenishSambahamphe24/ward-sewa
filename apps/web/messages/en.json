@@ -78,7 +78,6 @@
   "profile_name_label": "Full name",
   "profile_save": "Save",
   "profile_saved": "Name saved.",
-  "coming_next": "This page is being built in the next step.",
   "apply_heading": "New application",
   "apply_intro": "Choose your address and the kind of letter, fill in the details. You can add documents and submit afterwards.",
   "apply_step_address": "Your address",
@@ -195,5 +194,10 @@
   "review_needs_info_body": "They can edit and resubmit. Say exactly what is missing.",
   "review_reject": "Reject",
   "review_reject_title": "Reject this application?",
-  "review_reject_body": "The application is closed. The citizen sees your reason."
+  "review_reject_body": "The application is closed. The citizen sees your reason.",
+  "mine_intro": "Every letter you have asked for, newest first.",
+  "mine_your_turn": "Your turn",
+  "mine_created_at": "Started {at}",
+  "mine_empty": "You haven't applied for anything yet.",
+  "mine_empty_hint": "Choose your address and the kind of letter you need. You can save a draft and finish later."
 }

@@ -38,6 +38,13 @@ export interface Application {
   submittedAt: string | null;
 }
 
+export interface ApplicationsPage {
+  items: Application[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
 export interface NewApplication {
   serviceTypeId: number;
   localLevelCode: string;
