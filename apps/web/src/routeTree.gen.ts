@@ -19,6 +19,7 @@ import { Route as AuthedApplicationsIndexRouteImport } from './routes/_authed/ap
 import { Route as AuthedApplicationsApplicationIdRouteImport } from './routes/_authed/applications/$applicationId'
 import { Route as AuthedApplicationsNewRouteImport } from './routes/_authed/applications/new'
 import { Route as AuthedStaffIndexRouteImport } from './routes/_authed/staff/index'
+import { Route as AuthedStaffApplicationsApplicationIdRouteImport } from './routes/_authed/staff/applications/$applicationId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,12 @@ const AuthedStaffIndexRoute = AuthedStaffIndexRouteImport.update({
   path: '/staff/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedStaffApplicationsApplicationIdRoute =
+  AuthedStaffApplicationsApplicationIdRouteImport.update({
+    id: '/staff/applications/$applicationId',
+    path: '/staff/applications/$applicationId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthedAdminIndexRoute
   '/applications/': typeof AuthedApplicationsIndexRoute
   '/staff/': typeof AuthedStaffIndexRoute
+  '/staff/applications/$applicationId': typeof AuthedStaffApplicationsApplicationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthedAdminIndexRoute
   '/applications': typeof AuthedApplicationsIndexRoute
   '/staff': typeof AuthedStaffIndexRoute
+  '/staff/applications/$applicationId': typeof AuthedStaffApplicationsApplicationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/applications/': typeof AuthedApplicationsIndexRoute
   '/_authed/staff/': typeof AuthedStaffIndexRoute
+  '/_authed/staff/applications/$applicationId': typeof AuthedStaffApplicationsApplicationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/applications/'
     | '/staff/'
+    | '/staff/applications/$applicationId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/applications'
     | '/staff'
+    | '/staff/applications/$applicationId'
   id:
     | '__root__'
     | '/'
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/_authed/admin/'
     | '/_authed/applications/'
     | '/_authed/staff/'
+    | '/_authed/staff/applications/$applicationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedStaffIndexRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/staff/applications/$applicationId': {
+      id: '/_authed/staff/applications/$applicationId'
+      path: '/staff/applications/$applicationId'
+      fullPath: '/staff/applications/$applicationId'
+      preLoaderRoute: typeof AuthedStaffApplicationsApplicationIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
@@ -232,6 +252,7 @@ interface AuthedRouteChildren {
   AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
   AuthedApplicationsIndexRoute: typeof AuthedApplicationsIndexRoute
   AuthedStaffIndexRoute: typeof AuthedStaffIndexRoute
+  AuthedStaffApplicationsApplicationIdRoute: typeof AuthedStaffApplicationsApplicationIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
@@ -241,6 +262,8 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAdminIndexRoute: AuthedAdminIndexRoute,
   AuthedApplicationsIndexRoute: AuthedApplicationsIndexRoute,
   AuthedStaffIndexRoute: AuthedStaffIndexRoute,
+  AuthedStaffApplicationsApplicationIdRoute:
+    AuthedStaffApplicationsApplicationIdRoute,
 }
 
 const AuthedRouteWithChildren =
