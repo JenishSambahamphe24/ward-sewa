@@ -80,6 +80,7 @@ describe('POST /admin/staff', () => {
   it('refuses a phone that belongs to another admin', async () => {
     const res = await assign(ktmAdmin, { ...secretary, phone: '9841000002' });
     expect(res.status).toBe(409);
+    expect(res.body.error.details).toEqual({ reason: 'phone_is_staff' });
   });
 
   it('refuses a ward that does not exist in the municipality', async () => {
@@ -94,6 +95,7 @@ describe('POST /admin/staff', () => {
     const res = await assign(ktmAdmin, { ...chair, phone: '9841000102' });
     expect(res.status).toBe(409);
     expect(res.body.error.message).toBe('Ward 5 already has an active chair');
+    expect(res.body.error.details).toEqual({ reason: 'ward_has_chair' });
   });
 });
 

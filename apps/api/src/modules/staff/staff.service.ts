@@ -18,8 +18,11 @@ export interface StaffServiceDeps {
   transactions: TransactionRunner;
 }
 
+// `reason` lets clients show their own message without parsing the English text.
 const chairTaken = (wardNo: number) =>
-  new AppError(409, 'CONFLICT', `Ward ${wardNo} already has an active chair`);
+  new AppError(409, 'CONFLICT', `Ward ${wardNo} already has an active chair`, {
+    details: { reason: 'ward_has_chair' },
+  });
 
 export class StaffService {
   readonly #deps: StaffServiceDeps;
@@ -42,7 +45,14 @@ export class StaffService {
 
     const existing = await this.#deps.users.findByPhone(phone);
     if (existing && existing.role !== 'citizen') {
-      throw new AppError(409, 'CONFLICT', 'This phone number already belongs to staff or an admin');
+      throw new AppError(
+        409,
+        'CONFLICT',
+        'This phone number already belongs to staff or an admin',
+        {
+          details: { reason: 'phone_is_staff' },
+        },
+      );
     }
 
     const userId = await this.#deps.transactions.run(async (tx) => {

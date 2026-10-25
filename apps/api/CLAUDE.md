@@ -66,7 +66,8 @@ clients pointed at the Docker databases.
 `GET/POST /admin/staff`, `PATCH /admin/staff/:id`, municipality admins only. Every query joins
 through `wards` filtered by the admin's `local_level_code`; another municipality's staff, and
 admins themselves, return 404. One active chair per ward is checked in the service (friendly 409)
-and enforced by a partial unique index.
+and enforced by a partial unique index. The two 409s carry `details.reason` (`ward_has_chair`,
+`phone_is_staff`) so clients can tell them apart without parsing the message.
 
 ## Service types and applications
 

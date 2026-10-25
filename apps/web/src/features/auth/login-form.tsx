@@ -7,11 +7,10 @@ import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { ApiClient } from '@/lib/api-client.ts';
 import { cn } from '@/lib/cn.ts';
+import { PhoneHelper } from '@/lib/phone.helper.ts';
 import { m } from '@/paraglide/messages.js';
 import { AuthErrorHelper } from './auth-error.helper.ts';
 import type { User } from './session.ts';
-
-const PHONE = /^9[678]\d{8}$/;
 
 interface FieldMessageProps {
   id: string;
@@ -63,7 +62,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
   const [phoneInput, setPhoneInput] = useState('');
   const [code, setCode] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
-  const phone = NumeralHelper.toEnglish(phoneInput).replace(/\D/g, '');
+  const phone = PhoneHelper.normalize(phoneInput);
 
   const requestCode = useMutation({
     mutationFn: () => ApiClient.post('/auth/otp/request', { body: { phone } }),
@@ -79,7 +78,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
 
   const submitPhone = (event: FormEvent) => {
     event.preventDefault();
-    if (!PHONE.test(phone)) {
+    if (!PhoneHelper.isValid(phone)) {
       setPhoneError(m.login_phone_invalid());
       return;
     }
