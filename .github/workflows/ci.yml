@@ -60,6 +60,11 @@ jobs:
         run: docker compose up -d --build --wait
       - name: Readiness check
         run: curl --fail --silent --show-error localhost:3000/health/ready
+      - name: Website and API through nginx
+        run: |
+          curl --fail --silent --show-error localhost:8080/ | grep -q '<div id="root">'
+          curl --fail --silent --show-error localhost:8080/verify/ABCDEFGH23 | grep -q '<div id="root">'
+          curl --fail --silent --show-error localhost:8080/api/health/ready
       - name: Logs on failure
         if: failure()
         run: docker compose logs

@@ -12,7 +12,7 @@ packages/                # shared libraries
   config/                # @ward-sewa/config: eslint / prettier / tsconfig presets
   nepal-utils/           # @ward-sewa/nepal-utils: BS dates, Nepali numerals, divisions
 .github/                 # CI workflow, PR template
-docker-compose.yml       # postgres, mongo, redis, migrate, api, worker
+docker-compose.yml       # postgres, mongo, redis, migrate, api, worker, web
 ```
 
 ## Working in this repo
@@ -29,7 +29,7 @@ pnpm test && pnpm typecheck && pnpm lint && pnpm format:check   # what CI runs
 pnpm test:integration                     # needs `docker compose up -d --wait postgres redis`
 pnpm --filter @ward-sewa/nepal-utils coverage
 pnpm format                               # always from the repo root: Prettier reads .prettierignore from the cwd
-docker compose up -d --build --wait   # postgres:5432, mongo:27017, redis:6380 (not 6379), api:3000
+docker compose up -d --build --wait   # web:8080, api:3000, postgres:5432, mongo:27017, redis:6380
 curl localhost:3000/health/ready
 ```
 

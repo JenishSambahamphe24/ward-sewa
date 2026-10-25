@@ -29,4 +29,8 @@ pnpm --filter @ward-sewa/web build
 - **Imports:** `@/` points to `src/`; keep explicit `.ts`/`.tsx` extensions like the rest of the
   repo.
 - Tests: Vitest + Testing Library; `src/test/setup.ts` runs `cleanup()` (globals are off).
+- **Docker:** `apps/web/Dockerfile` builds the site in a Node stage and serves `dist/` from nginx
+  (`nginx.conf`) on host port 8080. nginx forwards `/api/*` to the `api` container, so production
+  is one origin like dev; it overwrites `X-Forwarded-For` and the API trusts exactly that one hop
+  (`TRUST_PROXY=1`). Hashed `/assets/*` are cached for a year, `index.html` never.
 - Vite is pinned to 7.x because the repo's Vitest 3 doesn't support Vite 8.

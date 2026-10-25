@@ -1,4 +1,10 @@
 **/node_modules
 **/coverage
+**/dist
+**/.turbo
+apps/web/src/paraglide
 .git
 .env
+uploads
+*.local.md
+credentials.md

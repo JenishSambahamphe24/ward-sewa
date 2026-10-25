@@ -62,7 +62,9 @@ services:
       REDIS_URL: redis://redis:6379
       AUTH_SECRET: dev-only-change-me-dev-only-change-me-0000
       UPLOAD_DIR: /data/uploads
-      PUBLIC_BASE_URL: http://localhost:5173
+      PUBLIC_BASE_URL: http://localhost:8080
+      # nginx (the web service) is the one proxy in front; it overwrites X-Forwarded-For.
+      TRUST_PROXY: 1
     volumes: [uploads-data:/data/uploads]
     ports: ['127.0.0.1:3000:3000']
     healthcheck:
@@ -85,12 +87,26 @@ services:
       MONGO_URL: mongodb://mongo:27017/ward_sewa
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /data/uploads
-      PUBLIC_BASE_URL: http://localhost:5173
+      PUBLIC_BASE_URL: http://localhost:8080
     volumes: [uploads-data:/data/uploads]
     depends_on:
       migrate: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
       mongo: { condition: service_healthy }
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports: ['127.0.0.1:8080:80']
+    healthcheck:
+      # 127.0.0.1, not localhost: busybox tries IPv6 first and nginx listens on IPv4 only.
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1/healthz']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      api: { condition: service_healthy }
 
 volumes:
   uploads-data:
