@@ -118,6 +118,7 @@ and enforced by a partial unique index. The two 409s carry `details.reason` (`wa
   data. Read letters from the snapshot, never by re-joining live tables.
 - Issue date and fiscal year come from `BsDateHelper.today()` (Nepal time).
 - `GET /verify/:code` is public and returns only what a verifier needs (no phone, no form data).
+  The PDF's QR code links to the web page `PUBLIC_BASE_URL/verify/<code>`, which calls it.
 
 ## Caching
 

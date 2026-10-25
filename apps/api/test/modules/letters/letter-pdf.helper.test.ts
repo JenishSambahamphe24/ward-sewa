@@ -46,7 +46,7 @@ describe('LetterPdfHelper.runs', () => {
 
 describe('LetterPdfHelper.render', () => {
   it('produces a PDF that embeds both the Devanagari and the Latin font', async () => {
-    const pdf = await LetterPdfHelper.render(letter, 'http://localhost:3000/verify/JVXWR6WF4T');
+    const pdf = await LetterPdfHelper.render(letter, 'http://localhost:5173/verify/JVXWR6WF4T');
     expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
     const text = pdf.toString('latin1');
     expect(text).toContain('NotoSansDevanagari');

@@ -62,7 +62,7 @@ services:
       REDIS_URL: redis://redis:6379
       AUTH_SECRET: dev-only-change-me-dev-only-change-me-0000
       UPLOAD_DIR: /data/uploads
-      PUBLIC_BASE_URL: http://localhost:3000
+      PUBLIC_BASE_URL: http://localhost:5173
     volumes: [uploads-data:/data/uploads]
     ports: ['127.0.0.1:3000:3000']
     healthcheck:
@@ -85,7 +85,7 @@ services:
       MONGO_URL: mongodb://mongo:27017/ward_sewa
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /data/uploads
-      PUBLIC_BASE_URL: http://localhost:3000
+      PUBLIC_BASE_URL: http://localhost:5173
     volumes: [uploads-data:/data/uploads]
     depends_on:
       migrate: { condition: service_completed_successfully }
