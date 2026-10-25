@@ -19,7 +19,10 @@ function RootLayout() {
       <main className="mx-auto max-w-5xl px-4 py-8">
         <Outlet />
       </main>
-      <footer className="mx-auto max-w-5xl border-t border-border px-4 py-6 text-sm text-muted-foreground">
+      <footer className="mx-auto flex max-w-5xl gap-6 border-t border-border px-4 py-6 text-sm text-muted-foreground">
+        <Link to="/verify" className="text-accent hover:underline">
+          {m.nav_verify()}
+        </Link>
         <Link to="/design" className="text-accent hover:underline">
           {m.nav_style_guide()}
         </Link>

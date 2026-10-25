@@ -14,6 +14,8 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
+import { Route as VerifyIndexRouteImport } from './routes/verify/index'
+import { Route as VerifyCodeRouteImport } from './routes/verify/$code'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
 import { Route as AuthedApplicationsIndexRouteImport } from './routes/_authed/applications/index'
 import { Route as AuthedApplicationsApplicationIdRouteImport } from './routes/_authed/applications/$applicationId'
@@ -44,6 +46,16 @@ const AuthedProfileRoute = AuthedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => AuthedRoute,
+} as any)
+const VerifyIndexRoute = VerifyIndexRouteImport.update({
+  id: '/verify/',
+  path: '/verify/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
   id: '/admin/',
@@ -83,6 +95,8 @@ export interface FileRoutesByFullPath {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/profile': typeof AuthedProfileRoute
+  '/verify/$code': typeof VerifyCodeRoute
+  '/verify/': typeof VerifyIndexRoute
   '/applications/$applicationId': typeof AuthedApplicationsApplicationIdRoute
   '/applications/new': typeof AuthedApplicationsNewRoute
   '/admin/': typeof AuthedAdminIndexRoute
@@ -95,6 +109,8 @@ export interface FileRoutesByTo {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/profile': typeof AuthedProfileRoute
+  '/verify/$code': typeof VerifyCodeRoute
+  '/verify': typeof VerifyIndexRoute
   '/applications/$applicationId': typeof AuthedApplicationsApplicationIdRoute
   '/applications/new': typeof AuthedApplicationsNewRoute
   '/admin': typeof AuthedAdminIndexRoute
@@ -109,6 +125,8 @@ export interface FileRoutesById {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/_authed/profile': typeof AuthedProfileRoute
+  '/verify/$code': typeof VerifyCodeRoute
+  '/verify/': typeof VerifyIndexRoute
   '/_authed/applications/$applicationId': typeof AuthedApplicationsApplicationIdRoute
   '/_authed/applications/new': typeof AuthedApplicationsNewRoute
   '/_authed/admin/': typeof AuthedAdminIndexRoute
@@ -123,6 +141,8 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/profile'
+    | '/verify/$code'
+    | '/verify/'
     | '/applications/$applicationId'
     | '/applications/new'
     | '/admin/'
@@ -135,6 +155,8 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/profile'
+    | '/verify/$code'
+    | '/verify'
     | '/applications/$applicationId'
     | '/applications/new'
     | '/admin'
@@ -148,6 +170,8 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/_authed/profile'
+    | '/verify/$code'
+    | '/verify/'
     | '/_authed/applications/$applicationId'
     | '/_authed/applications/new'
     | '/_authed/admin/'
@@ -161,6 +185,8 @@ export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
+  VerifyCodeRoute: typeof VerifyCodeRoute
+  VerifyIndexRoute: typeof VerifyIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -199,6 +225,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile'
       preLoaderRoute: typeof AuthedProfileRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/verify/': {
+      id: '/verify/'
+      path: '/verify'
+      fullPath: '/verify/'
+      preLoaderRoute: typeof VerifyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authed/admin/': {
       id: '/_authed/admin/'
@@ -274,6 +314,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
+  VerifyCodeRoute: VerifyCodeRoute,
+  VerifyIndexRoute: VerifyIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

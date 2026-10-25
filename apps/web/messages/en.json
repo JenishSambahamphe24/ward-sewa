@@ -199,5 +199,19 @@
   "mine_your_turn": "Your turn",
   "mine_created_at": "Started {at}",
   "mine_empty": "You haven't applied for anything yet.",
-  "mine_empty_hint": "Choose your address and the kind of letter you need. You can save a draft and finish later."
+  "mine_empty_hint": "Choose your address and the kind of letter you need. You can save a draft and finish later.",
+  "nav_verify": "Verify a letter",
+  "verify_heading": "Verify a letter",
+  "verify_intro": "Scan the QR code on the letter, or type the 10-character code printed under it. No login needed.",
+  "verify_code_label": "Verification code",
+  "verify_submit": "Check",
+  "verify_code_invalid": "A code has 10 letters and digits, like JVXWR6WF4T.",
+  "verify_valid_title": "This letter is genuine",
+  "verify_valid_body": "It was issued by the ward office below. Check that the details match the paper.",
+  "verify_not_found_title": "No letter has this code",
+  "verify_not_found_body": "Check the code for typos. If it is right, the letter was not issued through Ward Sewa.",
+  "verify_applicant": "Issued to",
+  "verify_letter_type": "Letter",
+  "verify_issued_by": "Issued by",
+  "verify_issued_by_value": "{localLevel}, ward {ward}"
 }
