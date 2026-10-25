@@ -30,6 +30,7 @@
     "pino": "catalog:be",
     "pino-http": "catalog:be",
     "qrcode": "catalog:be",
+    "swagger-ui-express": "catalog:be",
     "zod": "catalog:generic"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "@types/pg": "catalog:be",
     "@types/qrcode": "catalog:be",
     "@types/supertest": "catalog:be",
+    "@types/swagger-ui-express": "catalog:be",
     "@ward-sewa/config": "workspace:*",
     "drizzle-kit": "catalog:be",
     "pino-pretty": "catalog:be",

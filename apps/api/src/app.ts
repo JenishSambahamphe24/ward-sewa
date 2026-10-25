@@ -30,6 +30,7 @@ import { AuthService } from './modules/auth/auth.service.ts';
 import { OtpStore } from './modules/auth/otp.store.ts';
 import { SessionStore } from './modules/auth/session.store.ts';
 import { WardsRepository } from './modules/divisions/wards.repository.ts';
+import { docsRouter } from './modules/docs/docs.routes.ts';
 import { DocumentsController } from './modules/documents/documents.controller.ts';
 import { DocumentsRepository } from './modules/documents/documents.repository.ts';
 import { documentsRouter } from './modules/documents/documents.routes.ts';
@@ -96,6 +97,7 @@ export function createApp(deps: AppDeps): Express {
 
   // Health checks come first: orchestrators poll them constantly and must never be throttled.
   app.use(healthRouter(deps.healthChecks, { timeoutMs: deps.healthTimeoutMs }));
+  app.use(docsRouter());
   app.use(limit('global'));
   app.use('/auth/otp', limit('auth'));
   app.use('/verify', limit('verify'));

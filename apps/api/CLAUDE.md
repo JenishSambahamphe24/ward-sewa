@@ -176,6 +176,14 @@ LOCKED`, outbox id as `_id`, duplicate-key errors ignored), then deletes the row
   (`qlmanage -t` on macOS), not only by tests.
 - `GET /applications/:id/letter/pdf` returns 409 with `Retry-After: 5` until the PDF exists.
 
+## API documentation
+
+- `GET /docs` (Swagger UI) and `GET /openapi.json` (OpenAPI 3.1); behind nginx, `/api/docs`.
+- `modules/docs/openapi.helper.ts` lists every operation. Request bodies, queries and params are
+  converted from the real zod schemas (`z.toJSONSchema`); response shapes live in `docs.schema.ts`.
+- **A new route must be added to `OPERATIONS`.** `test/modules/docs/openapi.test.ts` walks Express's
+  route table and fails on any route that isn't documented, or documented but not served.
+
 ## Validation
 
 Validate every request body, query and param with zod in the controller before it reaches the
