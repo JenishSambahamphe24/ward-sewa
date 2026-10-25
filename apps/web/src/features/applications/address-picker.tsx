@@ -86,16 +86,11 @@ export function AddressPicker({ value, onChange }: AddressPickerProps) {
           <Select
             id={`${id}-${field.key}`}
             value={field.value}
+            options={field.options}
+            placeholder={m.address_choose()}
             disabled={field.options.length === 0}
-            onChange={(event) => field.onChange(event.target.value)}
-          >
-            <option value="">{m.address_choose()}</option>
-            {field.options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
+            onValueChange={field.onChange}
+          />
         </div>
       ))}
     </div>

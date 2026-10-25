@@ -9,6 +9,7 @@
     "db:migrate": "node --env-file-if-exists=../../.env src/db/migrate.ts --seed",
     "dev": "node --watch --env-file-if-exists=../../.env src/server.ts | pino-pretty",
     "dev:worker": "node --watch --env-file-if-exists=../../.env src/worker.ts | pino-pretty",
+    "seed:demo": "node --env-file-if-exists=../../.env src/cli/seed-demo.ts",
     "start": "node src/server.ts",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",

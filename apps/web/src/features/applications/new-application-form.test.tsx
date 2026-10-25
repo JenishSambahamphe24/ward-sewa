@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ThemeProvider } from '@/components/theme-provider.tsx';
 import { m } from '@/paraglide/messages.js';
 import { NewApplicationForm } from './new-application-form.tsx';
 
@@ -31,17 +32,24 @@ function renderForm(onCreated = vi.fn()) {
   });
   render(
     <QueryClientProvider client={client}>
-      <NewApplicationForm onCreated={onCreated} />
+      <ThemeProvider>
+        <NewApplicationForm onCreated={onCreated} />
+      </ThemeProvider>
     </QueryClientProvider>,
   );
   return onCreated;
 }
 
+async function choose(label: string, option: string | RegExp) {
+  await userEvent.click(screen.getByLabelText(label));
+  await userEvent.click(await screen.findByRole('option', { name: option }));
+}
+
 async function chooseKathmanduWard5() {
-  await userEvent.selectOptions(screen.getByLabelText(m.address_province()), 'NP03');
-  await userEvent.selectOptions(screen.getByLabelText(m.address_district()), 'NP0327');
-  await userEvent.selectOptions(screen.getByLabelText(m.address_local_level()), 'NP0327101');
-  await userEvent.selectOptions(screen.getByLabelText(m.address_ward()), '5');
+  await choose(m.address_province(), 'Bagmati');
+  await choose(m.address_district(), 'Kathmandu');
+  await choose(m.address_local_level(), /^Kathmandu /);
+  await choose(m.address_ward(), '५');
 }
 
 beforeEach(() => {
@@ -55,9 +63,9 @@ describe('NewApplicationForm', () => {
     fetchMock.mockResolvedValue(json(200, { serviceTypes: [] }));
     renderForm();
     await chooseKathmanduWard5();
-    await userEvent.selectOptions(screen.getByLabelText(m.address_province()), 'NP01');
-    expect((screen.getByLabelText(m.address_district()) as HTMLSelectElement).value).toBe('');
-    expect((screen.getByLabelText(m.address_ward()) as HTMLSelectElement).disabled).toBe(true);
+    await choose(m.address_province(), 'Koshi');
+    expect(screen.getByLabelText(m.address_district()).textContent).toBe(m.address_choose());
+    expect((screen.getByLabelText(m.address_ward()) as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('saves a draft with the right body and reuses the idempotency key on retry', async () => {
