@@ -20,7 +20,7 @@ function NewApplicationPage() {
         onCreated={(application) =>
           void navigate({
             to: '/applications/$applicationId',
-            params: { applicationId: String(application.id) },
+            params: { applicationId: application.id },
           })
         }
       />

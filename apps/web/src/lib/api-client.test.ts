@@ -52,4 +52,31 @@ describe('ApiClient', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
     await expect(ApiClient.get('/x')).rejects.toMatchObject({ status: 0, code: 'NETWORK' });
   });
+
+  it('sends FormData without a JSON Content-Type so the browser sets the boundary', async () => {
+    const fetchMock = reply(201, { id: 1 });
+    vi.stubGlobal('fetch', fetchMock);
+    const form = new FormData();
+    form.append('documentCode', 'citizenship');
+    await ApiClient.upload('/applications/1/documents', form);
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(init.method).toBe('POST');
+    expect(init.body).toBe(form);
+    expect(init.headers).not.toHaveProperty('Content-Type');
+  });
+
+  it('returns the body as a Blob for file downloads', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response('%PDF-1.7', { status: 200, headers: { 'Content-Type': 'application/pdf' } }),
+        ),
+    );
+    const blob = await ApiClient.blob('/applications/1/letter/pdf');
+    expect(blob.type).toBe('application/pdf');
+    expect(await blob.text()).toBe('%PDF-1.7');
+  });
 });

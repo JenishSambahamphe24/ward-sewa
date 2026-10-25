@@ -46,3 +46,31 @@ export interface NewApplication {
   houseNo?: string;
   formData: Record<string, string>;
 }
+
+export interface ApplicationDocument {
+  id: number;
+  documentCode: string;
+  originalName: string;
+  mime: string;
+  sizeBytes: number;
+  sha256: string;
+  uploadedAt: string;
+}
+
+export interface HistoryEntry {
+  fromStatus: ApplicationStatus | null;
+  toStatus: ApplicationStatus;
+  note: string | null;
+  at: string;
+}
+
+export interface IssuedLetter {
+  letterNo: string;
+  fiscalYear: string;
+  issuedDateBs: string;
+  issuedAt: string;
+  verificationCode: string;
+  pdfReady: boolean;
+}
+
+export const EDITABLE_STATUSES: readonly ApplicationStatus[] = ['draft', 'needs_info'];

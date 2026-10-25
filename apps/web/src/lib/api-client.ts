@@ -20,8 +20,10 @@ export class ApiError extends Error {
 
 interface RequestOptions {
   body?: unknown;
+  formData?: FormData;
   idempotencyKey?: string;
   signal?: AbortSignal;
+  responseType?: 'json' | 'blob';
 }
 
 const BASE_URL = '/api';
@@ -60,9 +62,18 @@ export class ApiClient {
     return ApiClient.request<T>('PATCH', path, options);
   }
 
+  static upload<T>(path: string, formData: FormData): Promise<T> {
+    return ApiClient.request<T>('POST', path, { formData });
+  }
+
+  static blob(path: string): Promise<Blob> {
+    return ApiClient.request<Blob>('GET', path, { responseType: 'blob' });
+  }
+
   static async request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
     const token = ApiClient.token();
     const headers: Record<string, string> = { Accept: 'application/json' };
+    // FormData sets its own multipart boundary, so only JSON bodies get a Content-Type here.
     if (options.body !== undefined) headers['Content-Type'] = 'application/json';
     if (token) headers.Authorization = `Bearer ${token}`;
     if (options.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey;
@@ -72,7 +83,9 @@ export class ApiClient {
       response = await fetch(`${BASE_URL}${path}`, {
         method,
         headers,
-        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        body:
+          options.formData ??
+          (options.body === undefined ? undefined : JSON.stringify(options.body)),
         signal: options.signal,
       });
     } catch {
@@ -80,6 +93,7 @@ export class ApiClient {
     }
 
     if (response.status === 204) return undefined as T;
+    if (response.ok && options.responseType === 'blob') return (await response.blob()) as T;
     const data: unknown = await response.json().catch(() => null);
     if (response.ok) return data as T;
 
